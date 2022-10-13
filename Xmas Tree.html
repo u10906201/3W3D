@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<style>
+
+
+</style>
+</head>
+
+<body> 
+<h1> Xmas Tree</h1>
+
+<div>
+<img src="https://i.imgur.com/My0oZyS.jpg" style="position:absolute;left:25vw;width:51.5vw;height:51.5vw;z-index:-1">
+<img src="https://i.imgur.com/gnvJVAM.png" style="position:absolute;top: 3vw;left:46vw;width:10vw;height:8vw;z-index:-1">
+<img src="https://i.imgur.com/oZIZ8SU.png" style="position:absolute;top: 18vw;left:45vw;width:64px;height:64px;z-index:-1">
+<img src="https://i.imgur.com/oZIZ8SU.png" style="position:absolute;top: 40vw;left:54vw;width:68px;height:68px;z-index:-1">
+<img src="https://i.imgur.com/hOxiPR3.png" style="position:absolute;top: 24vw;left:52vw;width:64px;height:64px;z-index:-1">
+<img src="https://i.imgur.com/hOxiPR3.png" style="position:absolute;top: 30vw;left:42vw;width:70px;height:70px;z-index:-1">
+<img src="https://i.imgur.com/SuoR7Em.png" style="position:absolute;top: 34vw;left:46vw;width:130px;height:130px;z-index:-1">
+<img src="https://i.imgur.com/oVpHiuL.png" style="position:absolute;top: 48vw;left:26vw;width:260px;height:160px;z-index:-1">
+</div>
+<br>
+<p style="position:absolute;left: 1%;top:4vw;">兩者不可同時開啟，先開正常，關掉後開複雜</p>
+<br>
+<button id ='toggle' style="position:absolute;top:8vw;width:10vw; height: 3vw">
+I am Off
+</button>
+<br><br><br>
+<button id ='toggle2' style="position:absolute;top:14vw;width:10vw; height: 3vw">
+複雜模式 Off
+</button>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<script>
+var powerState = false;
+	$('#toggle').click(function(){
+	powerState = !powerState;
+	if(powerState === true){
+		$('#toggle').text("I am On");
+	} else{
+		$('#toggle').text("I am Off");
+	}
+	});
+
+var crazyState = false;
+	$('#toggle2').click(function(){
+	crazyState = !crazyState;
+	if(crazyState === true){
+		$('#toggle2').text("複雜模式 On");
+	} else{
+		$('#toggle2').text("複雜模式 Off");
+	}
+	});
+var mystate = false;
+class Light {
+  
+  constructor(top,left) {  
+
+    this.element = document.createElement ('div');
+    this.element.id = 'light';
+    this.element.style.cssText = "position:absolute;width:20px;height:20px;border-radius:15px;z-index:1"; 
+	this.element.style.top = top;
+    this.element.style.left = left;
+
+    this.element.style.background = "hsl(210, 3%, 20%)";
+    document.getElementsByTagName('body')[0].appendChild(this.element);
+  }
+	
+	test(){
+	var self = this;
+  	var hue = Math.random()*200;
+	mystate = !mystate;
+	setTimeout(function(){
+		self.test()},500);
+		
+	if(powerState === false || mystate === false){
+		setTimeout(function(){
+		self.element.style.background = "hsl(210, 3%, 20%)"; },1200);
+		clearTimeout();
+	}else if((powerState === true)){
+  	self.element.style.background = "hsl(" + hue + ", 43%, 51%)";  
+	}	
+	}
+	
+	changeColor() {
+    var self = this;
+  	var hue = Math.random()*200;
+	setTimeout(function(){
+		self.changeColor()},500);
+		
+	if(powerState === false || mystate === false){
+	setTimeout(function(){
+		self.element.style.background = "hsl(210, 3%, 20%)"; },1000);
+		clearTimeout();
+	}else if((powerState === true)){
+  	self.element.style.background = "hsl(" + hue + ", 43%, 51%)";  
+	}	
+  }
+  
+	
+	changeColor1() {
+    var self = this;
+  	var hue = Math.random()*200;
+	setTimeout(function(){
+		self.changeColor1()},500);
+		
+	if(powerState === false || mystate === false){
+	setTimeout(function(){
+		self.element.style.background = "hsl(210, 3%, 20%)"; },1100);
+		clearTimeout();
+	}else if((powerState === true)){
+  	self.element.style.background = "hsl(" + hue + ", 43%, 51%)";  
+	}	
+  }
+  
+  changeColor2() {
+    var self = this;
+  	var hue = Math.random()*200;
+	setTimeout(function(){
+		self.changeColor2()},500);
+		
+	if(powerState === false || mystate === false){
+	setTimeout(function(){
+		self.element.style.background = "hsl(210, 3%, 20%)"; },1200);
+		clearTimeout();
+	}else if((powerState === true)){
+  	self.element.style.background = "hsl(" + hue + ", 43%, 51%)";  
+	}	
+  }
+	
+	crazymode(){
+	
+	var that = this;
+	var hue = Math.random()*200;
+
+	setTimeout(function(){
+		that.crazymode()},Math.random()*(2000-1000)+1000);
+	clearTimeout();
+	if(crazyState === false && powerState === false){
+	setTimeout(function(){
+		that.element.style.background = "hsl(210, 3%, 20%)"; },Math.random()*(4000-2000)+2000);
+		clearTimeout();
+	}else if((crazyState === true && powerState === false)){
+  	that.element.style.background = "hsl(" + hue + ", 43%, 51%)";  
+	}	
+	}
+	
+}
+////////////////////////////////
+init();
+function init() {
+	var light = new Light('13vw','48vw');
+	var light1 = new Light('15vw','50vw');
+	var light2 = new Light('17vw','52vw');
+	var light3 = new Light('19vw','54vw');
+	var light4 = new Light('21vw','56vw');
+	var light5 = new Light('23vw','44vw');
+	var light6 = new Light('25vw','46vw');
+	
+	var light7 = new Light('27vw','48vw');
+	var light8 = new Light('29vw','50vw');
+	var light9 = new Light('31vw','52vw');
+	var light10 = new Light('33vw','54vw');
+	var light11 = new Light('35vw','56vw');
+	var light12 = new Light('37vw','58vw');
+	var light13 = new Light('39vw','60vw');
+	var light14 = new Light('41vw','62vw');
+	
+	var light15 = new Light('41vw','37vw');
+	var light16 = new Light('42vw','39vw');
+	var light17 = new Light('43vw','41vw');
+	var light18 = new Light('44vw','43vw');
+	var light19 = new Light('45vw','45vw');
+	var light20 = new Light('46vw','47vw');
+	var light21 = new Light('47vw','49vw');
+	var light22 = new Light('48vw','51vw');
+	var light23 = new Light('49vw','53vw');
+	
+	var light24 = new Light('50vw','55vw');
+	
+	light24.test();
+	
+	light.changeColor();
+	light1.changeColor();
+	light2.changeColor();
+	light3.changeColor();
+	light4.changeColor();
+	
+	light5.changeColor1();
+	light6.changeColor1();
+	light7.changeColor1();
+	light8.changeColor1();
+	light9.changeColor1();
+	light10.changeColor1();
+	light11.changeColor1();
+	light12.changeColor1();
+	light13.changeColor1();
+	light14.changeColor1();
+	
+	light15.changeColor2();
+	light16.changeColor2();
+	light17.changeColor2();
+	light18.changeColor2();
+	light19.changeColor2();
+	light20.changeColor2();
+	light21.changeColor2();
+	light22.changeColor2();
+	light23.changeColor2();
+	clearTimeout();
+	
+	light.crazymode();
+	light1.crazymode();
+	light2.crazymode();
+	light3.crazymode();
+	light4.crazymode();
+	light5.crazymode();
+	
+	light6.crazymode();
+	light7.crazymode();
+	light8.crazymode();
+	light9.crazymode();
+	light10.crazymode();
+	light11.crazymode();
+	light12.crazymode();
+	light13.crazymode();
+	light14.crazymode();
+	
+	light15.crazymode();
+	light16.crazymode();
+	light17.crazymode();
+	light18.crazymode();
+	light19.crazymode();
+	light20.crazymode();
+	light21.crazymode();
+	light22.crazymode();
+	light23.crazymode();
+}
+
+
+
+
+
+</script>
+</body>
+
+</html>
