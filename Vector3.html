@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html style="height: 1000px","weight: 1000px">
+<body>
+
+<h1>HTML Input & Vector3 API</h1>
+<style>
+#v {
+  border-radius: 25px;
+  background: 		#E8E8D0;
+  border: 3px solid #000093;
+  position: relative;
+  top: -600px;
+
+  padding: 20px;
+  width: 225px;
+  height: 225px;
+}
+
+#w {
+  border-radius: 25px;
+  background: 		#E8E8D0;
+  border: 3px solid #01814A;
+  position: relative;
+  top: -620px;
+  padding: 20px;
+  width: 225px;
+  height: 225px;
+}
+
+#sol {
+  border-radius: 25px;
+  background: 		#E8E8D0;
+  border: 3px solid  	#8C8C00;
+  position: relative;
+  top: 0px;
+  left: 325px;
+  padding: 20px;
+  width: 225px;
+  height: 540px;
+}
+
+ </style>
+ <script src="https://threejs.org/build/three.min.js"></script>
+<script>
+function cal(){	
+	var x1 = document.getElementById("x1").value;
+	var y1 = document.getElementById("y1").value;
+	var z1 = document.getElementById("z1").value;
+	
+	var x2 = document.getElementById("x2").value;
+	var y2 = document.getElementById("y2").value;
+	var z2 = document.getElementById("z2").value;
+	var v = new THREE.Vector3(x1,y1,z1);
+	var w = new THREE.Vector3(x2,y2,z2);
+	
+	var vdot = v.clone().dot(w);
+	var vcross = v.clone().cross(w);
+	dot.value = vdot;	
+	cx.value = vcross.x;
+	cy.value = vcross.y;
+	cz.value = vcross.z;
+	
+}
+
+</script>
+
+<p id="sol"><font size="5"><b>inner product</b></font><br>
+<font color="#8C8C00">&ensp;—————————————&ensp;</font><br>
+<font size="5"><b>v．w</b></font> &ensp;<input type="text" style="width:140px; height:30px; font-size:24px;" id="dot" size="20"><br><br><br>
+<br><br><br><br><br><br>
+<font size="5"><b>v × w <br>(vector product)</b></font><br>
+<font color="#8C8C00">&ensp;—————————————&ensp;</font><br><br>
+<font size="5"><b>x</b></font> &ensp;<input type="text" style="width:140px; height:30px; font-size:24px;" id="cx" size="20"><br><br><br>
+<font size="5"><b>y</b></font> &ensp;<input type="text" style="width:140px; height:30px; font-size:24px;" id="cy" size="20"><br><br><br>
+<font size="5"><b>z</b></font> &ensp;<input type="text" style="width:140px; height:30px; font-size:24px;" id="cz" size="20"><br><br><br>
+</p>
+<p id="v"><font size="5"><b>v</b></font><br>
+<font color="#000093">&ensp;—————————————&ensp;</font><br>
+<font size="5"><b>x</b></font> &ensp;<input type="text" onchange = "cal(this);" style="width:140px; height:30px; font-size:24px;" id="x1" size="20"><br><br><br>
+<font size="5"><b>y</b></font> &ensp;<input type="text" onchange = "cal(this);" style="width:140px; height:30px; font-size:24px;" id="y1" size="20"><br><br><br>
+<font size="5"><b>z</b></font> &ensp;<input type="text" onchange = "cal(this);" style="width:140px; height:30px; font-size:24px;" id="z1" size="20"><br><br><br>
+</p>
+<br>
+<p id="w"><font size="5"><b>w</b></font><br>
+<font color="#01814A">&ensp;—————————————&ensp;</font><br>
+<font size="5"><b>x</b></font> &ensp;<input type="text" onchange = "cal(this);" style="width:140px; height:30px; font-size:24px;" id="x2" size="20"><br><br><br>
+<font size="5"><b>y</b></font> &ensp;<input type="text" onchange = "cal(this);" style="width:140px; height:30px; font-size:24px;" id="y2" size="20"><br><br><br>
+<font size="5"><b>z</b></font> &ensp;<input type="text" onchange = "cal(this);" style="width:140px; height:30px; font-size:24px;" id="z2" size="20"><br><br><br>
+</p>
+<br>
+</body>
+</html>
