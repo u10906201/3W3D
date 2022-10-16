@@ -78,7 +78,7 @@ class Light {
 		
 	if(powerState === false || mystate === false){
 		setTimeout(function(){
-		self.element.style.background = "hsl(210, 3%, 20%)"; },1200);
+		self.element.style.background = "hsl(210, 3%, 20%)"; },1000);
 		clearTimeout();
 	}else if((powerState === true)){
   	self.element.style.background = "hsl(" + hue + ", 43%, 51%)";  
@@ -99,51 +99,19 @@ class Light {
   	self.element.style.background = "hsl(" + hue + ", 43%, 51%)";  
 	}	
   }
-  
-	
-	changeColor1() {
-    var self = this;
-  	var hue = Math.random()*200;
-	setTimeout(function(){
-		self.changeColor1()},500);
-		
-	if(powerState === false || mystate === false){
-	setTimeout(function(){
-		self.element.style.background = "hsl(210, 3%, 20%)"; },1100);
-		clearTimeout();
-	}else if((powerState === true)){
-  	self.element.style.background = "hsl(" + hue + ", 43%, 51%)";  
-	}	
-  }
-  
-  changeColor2() {
-    var self = this;
-  	var hue = Math.random()*200;
-	setTimeout(function(){
-		self.changeColor2()},500);
-		
-	if(powerState === false || mystate === false){
-	setTimeout(function(){
-		self.element.style.background = "hsl(210, 3%, 20%)"; },1200);
-		clearTimeout();
-	}else if((powerState === true)){
-  	self.element.style.background = "hsl(" + hue + ", 43%, 51%)";  
-	}	
-  }
-	
+  	
 	crazymode(){
 	
 	var that = this;
 	var hue = Math.random()*200;
-
 	setTimeout(function(){
 		that.crazymode()},Math.random()*(2000-1000)+1000);
 	clearTimeout();
-	if(crazyState === false && powerState === false){
+	if(crazyState === false && powerState === false && mystate === false){
 	setTimeout(function(){
 		that.element.style.background = "hsl(210, 3%, 20%)"; },Math.random()*(4000-2000)+2000);
 		clearTimeout();
-	}else if((crazyState === true && powerState === false)){
+	}else if(crazyState === true && powerState === false && mystate === false){
   	that.element.style.background = "hsl(" + hue + ", 43%, 51%)";  
 	}	
 	}
@@ -181,34 +149,35 @@ function init() {
 	
 	var light24 = new Light('50vw','55vw');
 	
-	light24.test();
-	
+
+		light24.test();
 	light.changeColor();
 	light1.changeColor();
 	light2.changeColor();
 	light3.changeColor();
 	light4.changeColor();
 	
-	light5.changeColor1();
-	light6.changeColor1();
-	light7.changeColor1();
-	light8.changeColor1();
-	light9.changeColor1();
-	light10.changeColor1();
-	light11.changeColor1();
-	light12.changeColor1();
-	light13.changeColor1();
-	light14.changeColor1();
+	light5.changeColor();
+	light6.changeColor();
+	light7.changeColor();
+	light8.changeColor();
+	light9.changeColor();
+	light10.changeColor();
+	light11.changeColor();
+	light12.changeColor();
+	light13.changeColor();
+	light14.changeColor();
 	
-	light15.changeColor2();
-	light16.changeColor2();
-	light17.changeColor2();
-	light18.changeColor2();
-	light19.changeColor2();
-	light20.changeColor2();
-	light21.changeColor2();
-	light22.changeColor2();
-	light23.changeColor2();
+	light15.changeColor();
+	light16.changeColor();
+	light17.changeColor();
+	light18.changeColor();
+	light19.changeColor();
+	light20.changeColor();
+	light21.changeColor();
+	light22.changeColor();
+	light23.changeColor();
+
 	clearTimeout();
 	
 	light.crazymode();
