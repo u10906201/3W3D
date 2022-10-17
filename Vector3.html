@@ -50,18 +50,33 @@ function cal(){
 	var x2 = document.getElementById("x2").value;
 	var y2 = document.getElementById("y2").value;
 	var z2 = document.getElementById("z2").value;
+	
+
+	if(isNaN(x1) === false && isNaN(y1) === false && isNaN(z1) === false && isNaN(x2) === false && isNaN(y2) === false && isNaN(z2) === false){
 	var v = new THREE.Vector3(x1,y1,z1);
 	var w = new THREE.Vector3(x2,y2,z2);
-	
 	var vdot = v.clone().dot(w);
 	var vcross = v.clone().cross(w);
 	dot.value = vdot;	
 	cx.value = vcross.x;
 	cy.value = vcross.y;
 	cz.value = vcross.z;
+	}else{
+		wrong();
+
+	}
 	
 }
-
+function wrong(){
+	alert("向量定義錯誤!");
+	document.getElementById("x1").value ="";
+	document.getElementById("y1").value ="";
+	document.getElementById("z1").value ="";
+	
+	document.getElementById("x2").value ="";
+	document.getElementById("y2").value ="";
+	document.getElementById("z2").value ="";
+}
 </script>
 
 <p id="sol"><font size="5"><b>inner product</b></font><br>
