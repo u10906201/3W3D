@@ -121,7 +121,7 @@ function turn(){
 		angle += (2 * Math.PI) / 600;
 		hand.rotation.z = angle;
 		run = setTimeout(function(){
-			if(angle.toFixed(3)%((2 * Math.PI).toFixed(3))=== 0){
+			if(angle.toFixed(3)>=((2 * Math.PI).toFixed(3))){
 				angle = 0;
 				clearTimeout(run);
 			}else{
@@ -135,7 +135,7 @@ function turn(){
 			hand.rotation.z = angle;
 			run = setTimeout(function() {
 
-			if (angle.toFixed(3) % (2 * Math.PI).toFixed(3) === 0) {
+			if (angle.toFixed(3) >= (2 * Math.PI).toFixed(3) ) {
 			angle = 0;
 			hand.rotation.z = angle;
 			clearTimeout(run);
