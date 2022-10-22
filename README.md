@@ -7,7 +7,7 @@
 <br>
 -Hw2💻:https://u10906201.github.io/3W3D/Vector3.html
 <br>
--Hw3🕒:https://u10906201.github.io/3W3D/clock.html
+-Hw 🕒:https://u10906201.github.io/3W3D/clock.html
 <br></br><br></br><br></br>
 
 
