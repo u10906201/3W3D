@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<style>
+#info {
+  position: absolute;
+  top: 10px;
+  width: 100%;
+  padding: 5px;
+  text-align: center;
+  font-size:20px;
+  color: #ffff00
+}
+
+body {
+  margin =0;
+  overflow: hidden;
+  background=url("https://i.imgur.com/Zb0PeN3.jpg") center no-repeat;
+  background-size:cover;
+}
+
+</style>
+</head>
+
+<body> 
+
+<div id="info"><font size="6">Clock Hw</font><br>Start情況下長按Stop 3 秒後重置，Stop情況下長按Start 3 秒後再按Start重置</div><br>
+
+<body background = "https://i.imgur.com/Zb0PeN3.jpg">
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js">
+</script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<button id="add" style="position:absolute;left: 2vw;top:6vw; width:10vw; height: 3vw">add 10s</button>
+<button id="start" style="position:absolute;left: 2vw;top:12vw; width:10vw; height: 3vw">Start</button>
+<button id="quartz" style="position:absolute;left: 2vw;top:18vw; width:10vw; height: 3vw">quartz style</button>
+<audio id="sound" style="display:none">
+<source src="sounds/alarm.mp3" type='audio/mp3'>
+</audio>
+
+
+<script>
+var scene, renderer, camera;
+var angle = 0;
+var group = new THREE.Group();
+var circle, hand;
+var run = 0;
+//var sound;
+
+
+
+init();
+animate();
+
+
+
+var powerState = false;
+$('#start').click(function() {
+  powerState = !powerState;
+  pressed = {};
+
+    window.onmousedown = function(e) {
+		if ( pressed[e.which] ) return;
+		pressed[e.which] = e.timeStamp;
+	};
+    
+	window.onmouseup = function(e) {
+		if ( !pressed[e.which] ) {
+			return;
+		}
+		var duration = ( e.timeStamp - pressed[e.which] ) / 1000;
+		pressed[e.which] = 0;
+	
+	if(duration >= 3){
+		console.log("3s ago");
+		powerState = !powerState;
+		angle = 0;
+		clearTimeout(run);
+	}
+};
+  if (powerState === true) {
+    $('#start').text("Stop");
+	clearTimeout(run);
+	turn();
+  } else {
+    $('#start').text("Start");
+  }
+  
+  
+
+});
+
+
+
+var addten = false;
+$('#add').click(function() {
+	addten = !addten;
+	add();	
+});
+
+var quartzState = false;
+$('#quartz').click(function() {
+	quartzState = !quartzState;
+	if(run){
+		clearTimeout(run);
+	}
+	turn();
+});
+
+
+function add(){
+	angle += (2 * Math.PI) / 6;
+	hand.rotation.z = angle;
+    animate();
+}
+
+function turn(){
+	if(powerState === true){
+		if(quartzState === false){
+		angle += (2 * Math.PI) / 600;
+		hand.rotation.z = angle;
+		run = setTimeout(function(){
+			if(angle.toFixed(3)%((2 * Math.PI).toFixed(3))=== 0){
+				angle = 0;
+				clearTimeout(run);
+			}else{
+				turn();
+			}
+		}, 92); 
+			
+		}else if(quartzState === true){
+			console.log("1");
+			angle += (2 * Math.PI) / 60;
+			hand.rotation.z = angle;
+			run = setTimeout(function() {
+
+			if (angle.toFixed(3) % (2 * Math.PI).toFixed(3) === 0) {
+			angle = 0;
+			hand.rotation.z = angle;
+			clearTimeout(run);
+			quartzState = true;
+			}else{
+				turn();
+			}
+			},1000);
+		}
+	animate();
+	}
+}
+function init() {
+
+  renderer = new THREE.WebGLRenderer({
+  antialas:true,
+  alpha:true
+  });
+  
+  document.body.appendChild(renderer.domElement);
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+  renderer.setSize(width, height);
+
+  renderer.setClearAlpha(0.2);
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(35, width / height, 1, 100);
+
+  camera.position.y = 16;
+  camera.position.z = 40;
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  window.addEventListener('resize', onWindowResize, false);
+  
+  
+  //主體
+  let circlegeometry = new THREE.CircleGeometry(8, 60);
+  let circlematerial = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    side: THREE.DoubleSide
+  });
+  circle = new THREE.Mesh(circlegeometry, circlematerial);
+  scene.add(circle);
+  
+  //邊框
+  let circlegeometry2 = new THREE.CircleGeometry(9, 60);
+  let circlematerial2 = new THREE.MeshBasicMaterial({
+    color: '#708090',
+    side: THREE.DoubleSide
+  });
+  circle2 = new THREE.Mesh(circlegeometry2, circlematerial2);
+  circle2.position.set(0, -0.5, -1);
+  scene.add(circle2);
+  
+  //中心點
+  let circlegeometry3 = new THREE.CircleGeometry(1, 60);
+  let circlematerial3 = new THREE.MeshBasicMaterial({
+    color: 	'#5B5B5B',
+    side: THREE.DoubleSide
+  });
+  circle3 = new THREE.Mesh(circlegeometry3, circlematerial3);
+  circle3.position.set(0, 0, 0.01);
+  scene.add(circle3);
+  
+  //外部裝飾
+  let BoxGeometry = new THREE.BoxGeometry(20, 10, 0);
+  let Boxmaterial = new THREE.MeshBasicMaterial({
+    color: 	0x000000,
+    side: THREE.DoubleSide
+  });
+  cube = new THREE.Mesh(BoxGeometry, Boxmaterial);
+  cube.position.set(10, 2.3, -5);
+  scene.add(cube);
+  
+  cube3 = new THREE.Mesh(BoxGeometry, Boxmaterial);
+  cube3.position.set(-10, -6.3, -5);
+  scene.add(cube3);
+  
+  let BoxGeometry1 = new THREE.BoxGeometry(16, 8, 0);
+  let Boxmaterial1 = new THREE.MeshBasicMaterial({
+    color: 	'#d2b48c',
+    side: THREE.DoubleSide
+  });
+  cube1 = new THREE.Mesh(BoxGeometry1, Boxmaterial1);
+  cube1.position.set(10, 3, -3);
+  scene.add(cube1);
+  
+  cube4 = new THREE.Mesh(BoxGeometry1, Boxmaterial1);
+  cube4.position.set(-10, -5.2, -3);
+  scene.add(cube4);
+  
+  let circlegeometry4 = new THREE.CircleGeometry(14.2, 60);
+  let circlematerial4 = new THREE.MeshBasicMaterial({
+    color: 	0x000000,
+    side: THREE.DoubleSide
+  });
+  circle4 = new THREE.Mesh(circlegeometry4, circlematerial4);
+  circle4.position.set(0, -2.6, -6);
+  scene.add(circle4);
+  
+  let circlegeometry5 = new THREE.CircleGeometry(13.5, 60);
+  let circlematerial5 = new THREE.MeshBasicMaterial({
+    color: 	'#a0522d',
+    side: THREE.DoubleSide
+  });
+  circle5 = new THREE.Mesh(circlegeometry5, circlematerial5);
+  circle5.position.set(0, -2.2, -5.5);
+  scene.add(circle5);
+  
+
+  let circlegeometry6 = new THREE.CircleGeometry(6.1, 60);
+  let circlematerial6 = new THREE.MeshBasicMaterial({
+    color: 	0x000000,
+    side: THREE.DoubleSide
+  });
+  circle6 = new THREE.Mesh(circlegeometry6, circlematerial6);
+  circle6.position.set(9, -11, -4);
+  scene.add(circle6);
+  
+  let circlegeometry7 = new THREE.CircleGeometry(5.5, 60);
+  let circlematerial7 = new THREE.MeshBasicMaterial({
+    color: 	'#d2b48c',
+	
+    side: THREE.DoubleSide
+  });
+  circle7 = new THREE.Mesh(circlegeometry7, circlematerial7);
+  circle7.position.set(9, -10.8, -3.8);
+  scene.add(circle7);
+  
+  circle8 = new THREE.Mesh(circlegeometry6, circlematerial6);
+  circle8.position.set(-9, 6, -4);
+  scene.add(circle8);
+  
+  circle9 = new THREE.Mesh(circlegeometry7, circlematerial7);
+  circle9.position.set(-9, 6.1, -3.8);
+  scene.add(circle9);
+  
+  let handgeometry = new THREE.BufferGeometry();
+  let handmaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+
+  });
+  
+  
+  
+  //指針
+  var indices = [];
+  var points = [];
+
+  
+  points.push(
+  -0.3,0.1,0.1, 
+  0.3,0.1,0.1, 
+  0.03,7.5,0.1, 
+  -0.03,7.5,0.1
+  );
+  
+	indices.push(0,1,2, 2,3,0 );
+               
+	
+	handgeometry.setIndex(indices);
+	handgeometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
+	
+	handgeometry.computeVertexNormals();
+	handmaterial = new THREE.MeshBasicMaterial({
+    color: '#191970',
+		side: THREE.DoubleSide
+  });
+  
+  hand = new THREE.Mesh(handgeometry, handmaterial);
+  scene.add(hand);
+  
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function animate() {
+  //requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+</script>
+</body>
+
+</html>
