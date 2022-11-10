@@ -46,7 +46,7 @@ body {
 <script>
 
 class Lamp {
-  constructor(x, y, z, paint,type,turn) {
+  constructor(x, y, z, paint, type, turn) {
     this.x = x;
     this.y = y;
     this.z = z;
@@ -82,26 +82,26 @@ class Lamp {
         color: 0x7B7B7B
       });
       var spotLightLamp = new THREE.Mesh(geometry, material);
-      spotLightLamp.position.set(this.x, this.y, this.z);		
-      if(turn === 1){
-      spotLightLamp.rotation.z=(Math.PI/4);
-      spotLightLamp.rotation.y=(Math.PI/2);
-      scene.add(spotLightLamp);
-      }else if(turn === 2){
-      spotLightLamp.rotation.z=-(Math.PI/4);
-      scene.add(spotLightLamp);
-      }else if(turn === 3){
-      spotLightLamp.rotation.z=(Math.PI/4);
-      spotLightLamp.rotation.y=-(Math.PI/2);
-      scene.add(spotLightLamp);
-      }else if(turn === 4){
-      spotLightLamp.rotation.z=(Math.PI/4);
-      scene.add(spotLightLamp);
+      spotLightLamp.position.set(this.x, this.y, this.z);
+      if (turn === 1) {
+        spotLightLamp.rotation.z = (Math.PI / 4);
+        spotLightLamp.rotation.y = (Math.PI / 2);
+        scene.add(spotLightLamp);
+      } else if (turn === 2) {
+        spotLightLamp.rotation.z = -(Math.PI / 4);
+        scene.add(spotLightLamp);
+      } else if (turn === 3) {
+        spotLightLamp.rotation.z = (Math.PI / 4);
+        spotLightLamp.rotation.y = -(Math.PI / 2);
+        scene.add(spotLightLamp);
+      } else if (turn === 4) {
+        spotLightLamp.rotation.z = (Math.PI / 4);
+        scene.add(spotLightLamp);
+      }else if (turn === 4) {
+        spotLightLamp.rotation.z = (Math.PI / 4);
+        scene.add(spotLightLamp);
       }
-
-
     }
-
   }
 
   changeLight(i) {
@@ -146,12 +146,12 @@ function init() {
   scene.add(dl);
 
   //Pointlight
-  var PointLight1 = new Lamp(130, 125, 100,0, 1,0); //右下
-  var PointLight2 = new Lamp(130, 125, -60, 0,1,0); //右上
-  var PointLight3 = new Lamp(0, 125, 20, 0,1,0); //中間 
-  var PointLight4 = new Lamp(0, 125, -125, 0,1,0); //中上
-  var PointLight5 = new Lamp(-130, 125, 50, 0,1,0); //左下
-  var PointLight6 = new Lamp(-130, 125, -100, 0,1,0); //左上
+  var PointLight1 = new Lamp(130, 125, 100, 0, 1, 0); //右下
+  var PointLight2 = new Lamp(130, 125, -60, 0, 1, 0); //右上
+  var PointLight3 = new Lamp(0, 125, 20, 0, 1, 0); //中間 
+  var PointLight4 = new Lamp(0, 125, -125, 0, 1, 0); //中上
+  var PointLight5 = new Lamp(-130, 125, 50, 0, 1, 0); //左下
+  var PointLight6 = new Lamp(-130, 125, -100, 0, 1, 0); //左上
 
   $('#light').change(function() {
     PointLight1.changeLight($(this).val());
@@ -229,6 +229,7 @@ function init() {
   var wall16 = wall15.clone();
   wall16.position.set(80, 62.5, 30);
   scene.add(wall15, wall16);
+
 
   //booth
   var booth = buildBooth();
@@ -760,7 +761,7 @@ function init() {
   tvGroup10.add(tv10, screen10);
   tvGroup10.position.set(-197, 60, -100);
   scene.add(tvGroup10);
-	
+
   //張大千荷塘野趣一
   var tvGroup11 = new THREE.Group();
 
@@ -800,7 +801,7 @@ function init() {
   tvGroup11.rotation.y = Math.PI / 2;
   tvGroup11.position.set(-59, 60, -168);
   scene.add(tvGroup11);
-  
+
   //張大千荷塘野趣二
   var tvGroup12 = new THREE.Group();
 
@@ -840,7 +841,7 @@ function init() {
   tvGroup12.rotation.y = Math.PI / 2;
   tvGroup12.position.set(-27, 60, -168);
   scene.add(tvGroup12);
-  
+
   //張大千荷塘野趣三
   var tvGroup13 = new THREE.Group();
 
@@ -880,13 +881,13 @@ function init() {
   tvGroup13.rotation.y = Math.PI / 2;
   tvGroup13.position.set(5, 60, -168);
   scene.add(tvGroup13);
-  
+
   //張大千荷塘野趣四
   var tvGroup14 = new THREE.Group();
 
   var tvGeom14 = new THREE.BoxGeometry(2, 60, 30);
   var materials14 = [];
-  
+
   var conTex14 = loader.load('https://i.imgur.com/SLocsOb.jpg');
   let mPx14 = new THREE.MeshLambertMaterial({
     map: woodTex
@@ -920,15 +921,15 @@ function init() {
   tvGroup14.rotation.y = Math.PI / 2;
   tvGroup14.position.set(37, 60, -168);
   scene.add(tvGroup14);
-  
-  
+
+
   //書法背景
   //甲骨文
   var tvGroup15 = new THREE.Group();
 
   var tvGeom15 = new THREE.BoxGeometry(1, 65, 55);
   var materials15 = [];
-  
+
   var conTex15 = loader.load('https://i.imgur.com/Ti4mdku.jpg');
   let mPx15 = new THREE.MeshLambertMaterial({
     map: woodTex
@@ -958,16 +959,16 @@ function init() {
     }));
   screen15.position.set(0, 0, 0);
   screen15.rotation.y = Math.PI / 2;
-  tvGroup15.add(tv15, screen15);  
+  tvGroup15.add(tv15, screen15);
   tvGroup15.position.set(61, 70, 140);
   scene.add(tvGroup15);
-  
+
   //小篆
   var tvGroup16 = new THREE.Group();
 
   var tvGeom16 = new THREE.BoxGeometry(1, 40, 30);
   var materials16 = [];
-  
+
   var conTex16 = loader.load('https://i.imgur.com/0aeZLwX.jpg');
   let mPx16 = new THREE.MeshLambertMaterial({
     map: woodTex
@@ -997,17 +998,17 @@ function init() {
     }));
   screen16.position.set(0, 0, 0);
   screen16.rotation.y = Math.PI / 2;
-  tvGroup16.add(tv16, screen16);  
+  tvGroup16.add(tv16, screen16);
   tvGroup16.position.set(85, 70, 169);
   tvGroup16.rotation.y = Math.PI / 2;
   scene.add(tvGroup16);
-  
+
   //隸書
   var tvGroup17 = new THREE.Group();
 
   var tvGeom17 = new THREE.BoxGeometry(1, 45, 35);
   var materials17 = [];
-  
+
   var conTex17 = loader.load('https://i.imgur.com/TC2HJNm.jpg');
   let mPx17 = new THREE.MeshLambertMaterial({
     map: woodTex
@@ -1037,17 +1038,17 @@ function init() {
     }));
   screen17.position.set(0, 0, 0);
   screen17.rotation.y = Math.PI / 2;
-  tvGroup17.add(tv17, screen17);  
+  tvGroup17.add(tv17, screen17);
   tvGroup17.position.set(125, 70, 169);
   tvGroup17.rotation.y = Math.PI / 2;
   scene.add(tvGroup17);
-  
+
   //楷書
   var tvGroup18 = new THREE.Group();
 
   var tvGeom18 = new THREE.BoxGeometry(1, 60, 120);
   var materials18 = [];
-  
+
   var conTex18 = loader.load('https://i.imgur.com/vskVtTl.jpg');
   let mPx18 = new THREE.MeshLambertMaterial({
     map: woodTex
@@ -1077,16 +1078,16 @@ function init() {
     }));
   screen18.position.set(0, 0, 0);
   screen18.rotation.y = Math.PI / 2;
-  tvGroup18.add(tv18, screen18);  
+  tvGroup18.add(tv18, screen18);
   tvGroup18.position.set(199, 70, 100);
   scene.add(tvGroup18);
-  
+
   //草書
   var tvGroup19 = new THREE.Group();
 
   var tvGeom19 = new THREE.BoxGeometry(1, 72, 44);
   var materials19 = [];
-  
+
   var conTex19 = loader.load('https://i.imgur.com/f812C4e.jpg');
   let mPx19 = new THREE.MeshLambertMaterial({
     map: woodTex
@@ -1116,17 +1117,17 @@ function init() {
     }));
   screen19.position.set(0, 0, 0);
   screen19.rotation.y = Math.PI / 2;
-  tvGroup19.add(tv19, screen19);  
+  tvGroup19.add(tv19, screen19);
   tvGroup19.position.set(170, 70, 169);
-  tvGroup19.rotation.y=Math.PI/2;
+  tvGroup19.rotation.y = Math.PI / 2;
   scene.add(tvGroup19);
-  
+
   //王羲之 快雪時晴帖
   var tvGroup20 = new THREE.Group();
 
   var tvGeom20 = new THREE.BoxGeometry(1, 70, 35);
   var materials20 = [];
- 
+
   var conTex20 = loader.load('https://i.imgur.com/Vmp1hgs.jpg');
   let mPx20 = new THREE.MeshLambertMaterial({
     map: conTex20
@@ -1156,29 +1157,210 @@ function init() {
     }));
   screen20.position.set(0, 0, 0);
   screen20.rotation.y = Math.PI / 2;
-  tvGroup20.add(tv20, screen20);  
+  tvGroup20.add(tv20, screen20);
   tvGroup20.position.set(81, 70, 31);
-  tvGroup20.rotation.y=-(Math.PI / 2);
+  tvGroup20.rotation.y = -(Math.PI / 2);
   scene.add(tvGroup20);
+	
+  //清明上河圖卷1
+  var tvGroup21 = new THREE.Group();
+
+  var tvGeom21 = new THREE.BoxGeometry(1, 65, 65);
+  var materials21 = [];
+
+  var conTex21 = loader.load('https://i.imgur.com/7mlWzT3.jpg');
+  let mPx21 = new THREE.MeshLambertMaterial({
+    map: conTex21
+  });
+  let mNx21 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mPy21 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNy21 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mPz21 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNz21 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  mPx21.visible = false;
+  materials21.push(mPx21, mNx21, mPy21, mNy21, mPz21, mNz21);
+  var tv21 = new THREE.Mesh(tvGeom21, materials21);
+
+ var screen21 = new THREE.Mesh(new THREE.PlaneGeometry(65, 65),
+    new THREE.MeshLambertMaterial({
+      map: conTex21
+    }));
+  screen21.position.set(0, 0, 0);
+  screen21.rotation.y = Math.PI / 2;
+  tvGroup21.add(tv21, screen21);
+  tvGroup21.position.set(101, 70, -169);
+  tvGroup21.rotation.y = -(Math.PI / 2);
+  scene.add(tvGroup21);
   
-  //翠玉白菜
-  //let loader2 = new THREE.TextureLoader();
-  //loader2.crossOrigin = '';
-  //texture = loader.load('https://i.imgur.com/aCSu04I.png');
-  //var texMat = new THREE.MeshLambertMaterial({
-    //map: texture,
-    //transparent: true
-   // alphaTest: 0.5
- // });
+  //清明上河圖卷2
+  var tvGroup22 = new THREE.Group();
+
+  var tvGeom22 = new THREE.BoxGeometry(1, 65, 65);
+  var materials22 = [];
+
+  var conTex22 = loader.load('https://i.imgur.com/jezwz71.jpg');
+  let mPx22 = new THREE.MeshLambertMaterial({
+    map: conTex22
+  });
+  let mNx22 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mPy22 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNy22 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mPz22 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNz22 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  mPx22.visible = false;
+  materials22.push(mPx22, mNx22, mPy22, mNy22, mPz22, mNz22);
+  var tv22 = new THREE.Mesh(tvGeom22, materials22);
+
+  var screen22 = new THREE.Mesh(new THREE.PlaneGeometry(65, 65),
+    new THREE.MeshLambertMaterial({
+      map: conTex22
+    }));
+  screen22.position.set(0, 0, 0);
+  screen22.rotation.y = Math.PI / 2;
+  tvGroup22.add(tv22, screen22);
+  tvGroup22.position.set(165, 70, -169);
+  tvGroup22.rotation.y = -(Math.PI / 2);
+  scene.add(tvGroup22);
   
-  //grass = new THREE.Mesh(new THREE.PlaneGeometry(40, 60), texMat);
-  //grasses = []
+  //清明上河圖卷3
+  var tvGroup23 = new THREE.Group();
+
+  var tvGeom23 = new THREE.BoxGeometry(1, 65, 65);
+  var materials23 = [];
+
+  var conTex23 = loader.load('https://i.imgur.com/cTUCTtv.jpg');
+  let mPx23 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNx23 = new THREE.MeshLambertMaterial({
+    map: conTex23
+  });
+  let mPy23 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNy23 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mPz23 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNz23 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  mPx23.visible = false;
+  materials23.push(mPx23, mNx23, mPy23, mNy23, mPz23, mNz23);
+  var tv23 = new THREE.Mesh(tvGeom23, materials23);
+
+  var screen23 = new THREE.Mesh(new THREE.PlaneGeometry(65, 65),
+    new THREE.MeshLambertMaterial({
+      map: conTex23
+    }));
+  screen23.position.set(0, 0, 0);
+  screen23.rotation.y = Math.PI / 2;
+  tvGroup23.add(tv23, screen23);
+  tvGroup23.position.set(199, 70, -139);
   
-  //let grass1 = grass.clone();
-  //grass1.position.set(130,70,106);
-  //grasses.push (grass1)
-  //scene.add (grass1)
+  scene.add(tvGroup23);
   
+  //清明上河圖卷4
+  var tvGroup24 = new THREE.Group();
+
+  var tvGeom24 = new THREE.BoxGeometry(1, 65, 65);
+  var materials24 = [];
+
+  var conTex24 = loader.load('https://i.imgur.com/dQit1Ko.jpg');
+  let mPx24 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNx24 = new THREE.MeshLambertMaterial({
+    map: conTex24
+  });
+  let mPy24 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNy24 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mPz24 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNz24 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  mPx24.visible = false;
+  materials24.push(mPx24, mNx24, mPy24, mNy24, mPz24, mNz24);
+  var tv24 = new THREE.Mesh(tvGeom24, materials24);
+
+  var screen24 = new THREE.Mesh(new THREE.PlaneGeometry(65, 65),
+    new THREE.MeshLambertMaterial({
+      map: conTex24
+    }));
+  screen24.position.set(0, 0, 0);
+  screen24.rotation.y = Math.PI / 2;
+  tvGroup24.add(tv24, screen24);
+  tvGroup24.position.set(199, 70, -74.5);
+  
+  scene.add(tvGroup24);
+  
+  //清明上河圖卷4
+  var tvGroup25 = new THREE.Group();
+
+  var tvGeom25 = new THREE.BoxGeometry(1, 65, 65);
+  var materials25 = [];
+
+  var conTex25 = loader.load('https://i.imgur.com/rbCt7us.jpg');
+  let mPx25 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNx25 = new THREE.MeshLambertMaterial({
+    map: conTex25
+  });
+  let mPy25 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNy25 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mPz25 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  let mNz25 = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  mPx25.visible = false;
+  materials25.push(mPx25, mNx25, mPy25, mNy25, mPz25, mNz25);
+  var tv25 = new THREE.Mesh(tvGeom25, materials25);
+
+  var screen25 = new THREE.Mesh(new THREE.PlaneGeometry(65, 65),
+    new THREE.MeshLambertMaterial({
+      map: conTex25
+    }));
+  screen25.position.set(0, 0, 0);
+  screen25.rotation.y = Math.PI / 2;
+  tvGroup25.add(tv25, screen25);
+  tvGroup25.position.set(199, 70, -9.5);
+  
+  scene.add(tvGroup25);
   
   //玉石
   let loader3 = new THREE.TextureLoader();
@@ -1198,7 +1380,7 @@ function init() {
   // parameters need to be set in initial instantiation
   let geometry1 = new THREE.CylinderGeometry(12, 12, 10, 80, 2, true)
   let tread1 = new THREE.Mesh(geometry1, treadMat);
-  jadeAssembly.add(tread,tread1);
+  jadeAssembly.add(tread, tread1);
 
   let jadeTex = loader.load('https://i.imgur.com/ukwK50f.png');
   let jadeMat = new THREE.MeshLambertMaterial({
@@ -1218,44 +1400,39 @@ function init() {
   scene.add(jadeAssembly);
   jadeAssembly.rotation.x = Math.PI / 2
   jadeAssembly.rotation.z = Math.PI / 2
-  jadeAssembly.position.set(130,70,100);
-  
-  
-  
-  
-	//Spotlight
-  //w1 a2 s3 d4(方向)
-  var Spotlight1 = new Lamp(-40, 135, -20, tvGroup,2,2);//星夜
-  var Spotlight2 = new Lamp(-140, 135, 120, tvGroup2,2,2);//梵谷割耳
-  var Spotlight3 = new Lamp(-140, 135, 30, tvGroup3,2,2);//梵谷
-  var Spotlight4 = new Lamp(-130, 135, 125, tvGroup5,2,3);//蒙娜麗莎
-	var Spotlight5 = new Lamp(-120, 135, 120, tvGroup1,2,4);//戴珍珠耳環的少女
-	var Spotlight6 = new Lamp(-140, 135, 20, tvGroup4,2,1);//創世紀
-  var Spotlight7 = new Lamp(-20, 135, 130, tvGroup7,2,2);//孟克吶喊
-  var Spotlight8 = new Lamp(0, 135, -60, tvGroup6,2,1);//齊白石 蝦
-	var Spotlight9 = new Lamp(-140, 135, -60, tvGroup8,2,3);//陳進合奏
-  var Spotlight10 = new Lamp(-140, 135, -140, tvGroup9,2,1);//郭雪湖南街殷賑
-  var Spotlight11 = new Lamp(-160, 135, -100, tvGroup10,2,2);//黃土水水牛群像-左
-  
+  jadeAssembly.position.set(130, 70, 100);
+
+  //Spotlight
+  //w1 a2 s3 d4 中間5(方向)
+  var Spotlight1 = new Lamp(-40, 135, -20, tvGroup, 2, 2); //星夜
+  var Spotlight2 = new Lamp(-140, 135, 120, tvGroup2, 2, 2); //梵谷割耳
+  var Spotlight3 = new Lamp(-140, 135, 30, tvGroup3, 2, 2); //梵谷
+  var Spotlight4 = new Lamp(-130, 135, 125, tvGroup5, 2, 3); //蒙娜麗莎
+  var Spotlight5 = new Lamp(-120, 135, 120, tvGroup1, 2, 4); //戴珍珠耳環的少女
+  var Spotlight6 = new Lamp(-140, 135, 20, tvGroup4, 2, 1); //創世紀
+  var Spotlight7 = new Lamp(-20, 135, 130, tvGroup7, 2, 2); //孟克吶喊
+  var Spotlight8 = new Lamp(0, 135, -60, tvGroup6, 2, 1); //齊白石 蝦
+  var Spotlight9 = new Lamp(-140, 135, -60, tvGroup8, 2, 3); //陳進合奏
+  var Spotlight10 = new Lamp(-140, 135, -140, tvGroup9, 2, 1); //郭雪湖南街殷賑
+  var Spotlight11 = new Lamp(-160, 135, -100, tvGroup10, 2, 2); //黃土水水牛群像-左
+
   var t1 = new THREE.Mesh(new THREE.BoxGeometry(0.01, 60, 30), new THREE.MeshLambertMaterial());
   t1.position.set(-43, 50, -169.9);
-  t1.rotation.y=Math.PI/2;
+  t1.rotation.y = Math.PI / 2;
   scene.add(t1);
   var t2 = new THREE.Mesh(new THREE.BoxGeometry(0.01, 60, 30), new THREE.MeshLambertMaterial());
   t2.position.set(21, 50, -169.9);
-  t2.rotation.y=Math.PI/2;
+  t2.rotation.y = Math.PI / 2;
   scene.add(t2);
- 	var Spotlight12 = new Lamp(-43, 135, -130, t1,2,1);//張大千荷塘野趣一二
-  var Spotlight13 = new Lamp(21, 135, -130, t2,2,1);//張大千荷塘野趣三四
- var Spotlight14 = new Lamp(80, 135, 140, tvGroup15,2,2);//甲骨文
- var Spotlight15 = new Lamp(85, 135, 145, tvGroup16,2,3);//小篆
-  var Spotlight16 = new Lamp(125, 135, 145, tvGroup17,2,3);//隸書
-  var Spotlight17 = new Lamp(170, 135, 100, tvGroup18,2,4);//楷書
-  var Spotlight18 = new Lamp(170, 135, 145, tvGroup19,2,3);//草書
-  var Spotlight19 = new Lamp(80, 135, 50, tvGroup20,2,1);//王羲之快雪時晴帖
-  
-
-
+  var Spotlight12 = new Lamp(-43, 135, -130, t1, 2, 1); //張大千荷塘野趣一二
+  var Spotlight13 = new Lamp(21, 135, -130, t2, 2, 1); //張大千荷塘野趣三四
+  var Spotlight14 = new Lamp(80, 135, 140, tvGroup15, 2, 2); //甲骨文
+  var Spotlight15 = new Lamp(85, 135, 145, tvGroup16, 2, 3); //小篆
+  var Spotlight16 = new Lamp(125, 135, 145, tvGroup17, 2, 3); //隸書
+  var Spotlight17 = new Lamp(170, 135, 100, tvGroup18, 2, 4); //楷書
+  var Spotlight18 = new Lamp(170, 135, 145, tvGroup19, 2, 3); //草書
+  var Spotlight19 = new Lamp(80, 135, 50, tvGroup20, 2, 1); //王羲之快雪時晴帖
+  var Spotlight20 = new Lamp(80, 135, 50, tvGroup20, 2, 1); //王羲之快雪時晴帖
 
 }
 
@@ -1339,7 +1516,7 @@ function buildChair() {
 }
 
 function animate() {
-	let cameraRoot = camera.position.clone();
+  let cameraRoot = camera.position.clone();
   cameraRoot.y = 0;
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
