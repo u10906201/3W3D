@@ -38,13 +38,52 @@ body {
 <option value="80"></option>
 <option value="90"></option>
 <option value="100"></option>
-</datalist>
+</datalist>電源開關
+<input type="range" id='turn' min=0 max=1  >
+
+<select id="draw" name="draw">
+  <option value = 0>鳥瞰</option>
+  <optgroup label="世界名畫">
+    <option value = 1 >梵谷-星夜</option>
+    <option value = 2 >梵谷-耳朵綁上繃帶的自畫像</option>
+    <option value = 3 >梵谷-自畫像</option>
+    <option value = 4 >達文西-蒙娜麗莎的微笑</option>
+    <option value = 5 >維梅爾-戴珍珠耳環的少女</option>
+    <option value = 6 >摩西-創世紀</option>
+    <option value = 7 >孟克-吶喊</option>
+  </optgroup>
+  <optgroup label="水墨畫">
+    <option value = 8 >齊白石-蝦</option>
+    <option value = 12 >張大千-荷塘野趣一二</option>
+    <option value = 15 >張大千-荷塘野趣三四</option>
+  </optgroup>
+  <optgroup label="台灣畫家">
+    <option value = 9 >陳進-合奏</option>
+    <option value = 10 >郭雪湖-南街殷賑</option>
+    <option value = 11 >黃土水-水牛群像</option>
+  </optgroup>
+   <optgroup label="漢文化">
+    <option value = 16 >甲骨文</option>
+    <option value = 17 >小篆</option>
+    <option value = 18 >隸書與草書</option>
+    <option value = 19 >楷書</option>
+    <option value = 21 >王羲之-快雪時晴帖</option>
+    <option value = 22 >古玉</option> 
+  </optgroup>
+  <optgroup label="清明上河圖">
+    <option value = 23 >清明上河圖左</option>
+    <option value = 24 >清明上河圖右一</option>
+    <option value = 25 >清明上河圖右二</option>
+  </optgroup>
+</select>
+
+<button type="button" id="the_btn1">觀賞</button>
 <script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 
-<script>
 
+<script>
 class Lamp {
   constructor(x, y, z, paint, type, turn) {
     this.x = x;
@@ -64,14 +103,6 @@ class Lamp {
       PointLightLamp.position.set(this.x, this.y, this.z);
       scene.add(PointLightLamp);
     } else if (type === 2) {
-
-      //spotLight = new THREE.SpotLight(0xffffff, 2, 100, -(Math.PI / 5), 0.974);
-      //spotLight.position.set(-40, 135, -20);
-      //spotLight.target = tvGroup;
-      //scene.add(spotLight);
-
-      //spotLightHelper = new THREE.SpotLightHelper(spotLight);
-      //scene.add(spotLightHelper);
       this.Light = new THREE.SpotLight(0xffffff, 1.35, 150, -(Math.PI / 5), 0.974);
       this.Light.position.set(this.x, this.y, this.z);
       this.Light.target = paint;
@@ -97,21 +128,27 @@ class Lamp {
       } else if (turn === 4) {
         spotLightLamp.rotation.z = (Math.PI / 4);
         scene.add(spotLightLamp);
-      }else if (turn === 4) {
-        spotLightLamp.rotation.z = (Math.PI / 4);
+      }else if (turn === 5) {
         scene.add(spotLightLamp);
       }
     }
   }
 
   changeLight(i) {
+  console.log(i);
     this.Light.intensity = i / 200;
   }
-
+	
+  turnLight(j){
+		if(j == 0){
+    	this.Light.intensity = 0;
+    }else{
+    	this.Light.intensity = 1.3;
+    }
+  }
 }
 
-var camera, scene, renderer;
-
+var camera, scene, renderer,eyecamera;
 init();
 animate();
 
@@ -128,17 +165,9 @@ function init() {
   camera.position.set(0, 400, 500); // camera at (0,0,500)
   let controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-  ////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+
   var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
-  //scene.add(gridXZ);
-
-  //const pointLight = new THREE.PointLight(0xffffff, 1);
-  //pointLight.position.set(100, 150, 0);
-  //scene.add(pointLight);
-
-  //const sphereSize = 3;
-  //const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
-  //scene.add(pointLightHelper);
 
   //DirectionalLight方向光	
   let dl = new THREE.DirectionalLight(0xdddddd, 0.1); // color, intensity, distance, decay
@@ -161,6 +190,7 @@ function init() {
     PointLight5.changeLight($(this).val());
     PointLight6.changeLight($(this).val());
   });
+  
 
   //floor
   var floor1 = buildFloor();
@@ -246,6 +276,11 @@ function init() {
   var chair2 = chair.clone();
   chair2.position.set(-140, 0, -15);
   scene.add(chair1, chair2);
+  
+  var chair3 = chair.clone();
+  chair3.position.set(130, 0, -60);
+  chair3.rotation.y = Math.PI / 2;
+  scene.add(chair3);
 
   //pillar
   var pillar = buildPillar();
@@ -312,7 +347,147 @@ function init() {
   var board17 = buildBoard(42, 5, 22);
   board17.position.set(0, 2.5, -100);
   scene.add(board17);
+	
+  //Pole
+  var pole1 = buildPole(3, 3, 20);
+	pole1.position.set(-130,139,120);
+  scene.add(pole1);
+  var pole2 = buildPole(3, 3, 20);
+	pole2.position.set(-130,139,120);
+  pole2.rotation.y = Math.PI / 2;
+  scene.add(pole2);
+  var pole3 = buildPole(1, 1, 60);
+	pole3.position.set(-130,169,120);
+  pole3.rotation.x = Math.PI / 2;
+  scene.add(pole3);
+  
+  var pole4 = buildPole(3, 3, 20);
+	pole4.position.set(-140,139,30);
+  scene.add(pole4);
+  var pole5 = buildPole(3, 3, 20);
+	pole5.position.set(-140,139,30);
+  pole5.rotation.y = Math.PI / 2;
+  scene.add(pole5);
+  var pole6 = buildPole(1, 1, 60);
+	pole6.position.set(-140,169,30);
+  pole6.rotation.x = Math.PI / 2;
+  scene.add(pole6);
+  
+  var pole7 = buildPole(3, 3, 90);
+	pole7.position.set(-140,139,-100);
+  scene.add(pole7);
+  var pole8 = buildPole(3, 3, 40);
+	pole8.position.set(-140,139,-100);
+  pole8.rotation.y = Math.PI / 2;
+  scene.add(pole8);
+  var pole9 = buildPole(1, 1, 60);
+	pole9.position.set(-140,169,-100);
+  pole9.rotation.x = Math.PI / 2;
+  scene.add(pole9);
+  
+  var pole10 = buildPole(3, 3, 5);
+	pole10.position.set(-20,139,130);
+  scene.add(pole10);
+  var pole11 = buildPole(1, 1, 60);
+	pole11.position.set(-20,169,130);
+  pole11.rotation.x = Math.PI / 2;
+  scene.add(pole11);
+  
+  var pole12 = buildPole(3, 3, 5);
+	pole12.position.set(-40,139,-20);
+  scene.add(pole12);
+  var pole13 = buildPole(1, 1, 60);
+	pole13.position.set(-40,169,-20);
+  pole13.rotation.x = Math.PI / 2;
+  scene.add(pole13);
+  
+  var pole14 = buildPole(3, 3, 5);
+	pole14.position.set(0,139,-60);
+  scene.add(pole14);
+  var pole15 = buildPole(1, 1, 60);
+	pole15.position.set(0,169,-60);
+  pole15.rotation.x = Math.PI / 2;
+  scene.add(pole15);
+  
+  var pole16 = buildPole(3, 3, 80);
+	pole16.position.set(-11,139,-130);
+  pole16.rotation.y = Math.PI / 2;
+  scene.add(pole16);
+  var pole17 = buildPole(1, 1, 60);
+	pole17.position.set(-43,169,-130);
+  pole17.rotation.x = Math.PI / 2;
+  scene.add(pole17); 
+  var pole18 = buildPole(1, 1, 60);
+	pole18.position.set(21,169,-130);
+  pole18.rotation.x = Math.PI / 2;
+  scene.add(pole18);
+  
+  var pole19 = buildPole(3, 3, 90);
+	pole19.position.set(127,139,145);
+  pole19.rotation.y = Math.PI / 2;
+  scene.add(pole19);
+  var pole20 = buildPole(1, 1, 60);
+	pole20.position.set(83,169,145);
+  pole20.rotation.x = Math.PI / 2;
+  scene.add(pole20);
+  var pole21 = buildPole(3, 3, 90);
+	pole21.position.set(170,139,100);
+  scene.add(pole21);
+  var pole22 = buildPole(3, 3, 90);
+	pole22.position.set(83,139,100);
+  scene.add(pole22);
+  var pole23 = buildPole(1, 1, 60);
+	pole23.position.set(171,169,145);
+  pole23.rotation.x = Math.PI / 2;
+  scene.add(pole23);
+  var pole24 = buildPole(3, 3, 90);
+	pole24.position.set(127,139,100);
+  pole24.rotation.y = Math.PI / 2;
+  scene.add(pole24);
+  var pole25 = buildPole(3, 3, 90);
+	pole25.position.set(127,139,100);
+  scene.add(pole25);
+  var pole26 = buildPole(3, 3, 90);
+	pole26.position.set(127,139,55);
+  pole26.rotation.y = Math.PI / 2;
+  scene.add(pole26);
+  var pole27 = buildPole(1, 1, 60);
+	pole27.position.set(83,169,55);
+  pole27.rotation.x = Math.PI / 2;
+  scene.add(pole27);
+  var pole28 = buildPole(1, 1, 60);
+	pole28.position.set(170,169,55);
+  pole28.rotation.x = Math.PI / 2;
+  scene.add(pole28);
+  var pole29 = buildPole(1, 1, 60);
+	pole29.position.set(130,169,100);
+  pole29.rotation.x = Math.PI / 2;
+  scene.add(pole29);
 
+  var pole30 = buildPole(3, 3, 75);
+	pole30.position.set(132.5,139,-145);
+  pole30.rotation.y = Math.PI / 2;
+  scene.add(pole30);
+  var pole31 = buildPole(1, 1, 60);
+	pole31.position.set(100,169,-145);
+  pole31.rotation.x = Math.PI / 2;
+  scene.add(pole31);
+  var pole32 = buildPole(1, 1, 60);
+	pole32.position.set(165,169,-145);
+  pole32.rotation.x = Math.PI / 2;
+  scene.add(pole32);
+  var pole33 = buildPole(3, 3, 135);
+	pole33.position.set(170,139,-72.5);
+  scene.add(pole33);
+  var pole34 = buildPole(1, 1, 60);
+	pole34.position.set(170,169,-135);
+  pole34.rotation.x = Math.PI / 2;
+  scene.add(pole34);
+  var pole35 = buildPole(1, 1, 60);
+	pole35.position.set(170,169,-10);
+  pole35.rotation.x = Math.PI / 2;
+  scene.add(pole35);
+  
   //draw星夜
   var tvGroup = new THREE.Group();
 
@@ -343,7 +518,8 @@ function init() {
   mPx.visible = false;
   materials.push(mPx, mNx, mPy, mNy, mPz, mNz);
   var tv = new THREE.Mesh(tvGeom, materials);
-
+	let frameMap = new THREE.TextureLoader().load ('https://i.imgur.com/YWvEIPP.png');
+	let frame1 = new THREE.Mesh (new THREE.BoxGeometry(2*1.01, 40*1.01, 60*1.01), new THREE.MeshLambertMaterial({map:frameMap, transparent:true}));
   var screen = new THREE.Mesh(new THREE.PlaneGeometry(60, 40),
     new THREE.MeshLambertMaterial({
       map: conTex
@@ -352,14 +528,16 @@ function init() {
   screen.rotation.y = Math.PI / 2;
   tvGroup.add(tv, screen);
   tvGroup.position.set(-78, 80, -20);
-  scene.add(tvGroup);
+  frame1.position.set(-78, 80, -20);
+  scene.add(tvGroup,frame1);
+  
 
   //draw戴珍珠耳環的少女
   var tvGroup1 = new THREE.Group();
 
   var tvGeom1 = new THREE.BoxGeometry(2, 70, 46);
   var materials1 = [];
-
+	
   var conTex1 = loader.load('https://i.imgur.com/ENK0PtC.jpg');
   let mPx1 = new THREE.MeshLambertMaterial({
     map: woodTex
@@ -382,7 +560,7 @@ function init() {
   mNx1.visible = false;
   materials1.push(mPx1, mNx1, mPy1, mNy1, mPz1, mNz1);
   var tv1 = new THREE.Mesh(tvGeom1, materials1);
-
+	let frame2 = new THREE.Mesh (new THREE.BoxGeometry(2*1.01, 70*1.01, 46*1.01), new THREE.MeshLambertMaterial({map:frameMap, transparent:true}));
   var screen1 = new THREE.Mesh(new THREE.PlaneGeometry(46, 70),
     new THREE.MeshLambertMaterial({
       map: conTex1,
@@ -394,7 +572,8 @@ function init() {
   tvGroup1.add(tv1, screen1);
   //tvGroup1.rotation.y = (Math.PI/2);
   tvGroup1.position.set(-63, 70, 130);
-  scene.add(tvGroup1);
+  frame2.position.set(-63, 70, 130);
+  scene.add(tvGroup1,frame2);
 
   //draw梵谷割耳
   var tvGroup2 = new THREE.Group();
@@ -425,7 +604,7 @@ function init() {
   mPx2.visible = false;
   materials2.push(mPx2, mNx2, mPy2, mNy2, mPz2, mNz2);
   var tv2 = new THREE.Mesh(tvGeom2, materials2);
-
+	let frame3 = new THREE.Mesh (new THREE.BoxGeometry(2*1.01, 70*1.01, 60*1.01), new THREE.MeshLambertMaterial({map:frameMap, transparent:true}));
   var screen2 = new THREE.Mesh(new THREE.PlaneGeometry(60, 70),
     new THREE.MeshLambertMaterial({
       map: conTex2
@@ -434,7 +613,8 @@ function init() {
   screen2.rotation.y = Math.PI / 2;
   tvGroup2.add(tv2, screen2);
   tvGroup2.position.set(-197, 70, 120);
-  scene.add(tvGroup2);
+  frame3.position.set(-197, 70, 120);
+  scene.add(tvGroup2,frame3);
 
   //draw梵谷
   var tvGroup3 = new THREE.Group();
@@ -465,7 +645,7 @@ function init() {
   mPx3.visible = false;
   materials3.push(mPx3, mNx3, mPy3, mNy3, mPz3, mNz3);
   var tv3 = new THREE.Mesh(tvGeom3, materials3);
-
+	let frame4 = new THREE.Mesh (new THREE.BoxGeometry(2*1.01, 70*1.01, 60*1.01), new THREE.MeshLambertMaterial({map:frameMap, transparent:true}));
   var screen3 = new THREE.Mesh(new THREE.PlaneGeometry(60, 70),
     new THREE.MeshLambertMaterial({
       map: conTex3
@@ -474,7 +654,8 @@ function init() {
   screen3.rotation.y = Math.PI / 2;
   tvGroup3.add(tv3, screen3);
   tvGroup3.position.set(-197, 70, 30);
-  scene.add(tvGroup3);
+  frame4.position.set(-197, 70, 30);
+  scene.add(tvGroup3,frame4);
 
   //draw創世紀
   var tvGroup4 = new THREE.Group();
@@ -505,7 +686,8 @@ function init() {
   mPx4.visible = false;
   materials4.push(mPx4, mNx4, mPy4, mNy4, mPz4, mNz4);
   var tv4 = new THREE.Mesh(tvGeom4, materials4);
-
+  let frameMap1 = new THREE.TextureLoader().load ('https://i.imgur.com/4YoNeSd.png');
+	let frame5 = new THREE.Mesh (new THREE.BoxGeometry(2*1.01, 40*1.01, 100*1.01), new THREE.MeshLambertMaterial({map:frameMap1, transparent:true}));
   var screen4 = new THREE.Mesh(new THREE.PlaneGeometry(100, 40),
     new THREE.MeshLambertMaterial({
       map: conTex4
@@ -515,7 +697,9 @@ function init() {
   tvGroup4.add(tv4, screen4);
   tvGroup4.rotation.y = -(Math.PI / 2);
   tvGroup4.position.set(-140, 75, -28);
-  scene.add(tvGroup4);
+  frame5.position.set(-140, 75, -28);
+  frame5.rotation.y = -(Math.PI / 2);
+  scene.add(tvGroup4,frame5);
 
   //draw蒙娜麗莎
   var tvGroup5 = new THREE.Group();
@@ -546,7 +730,7 @@ function init() {
   mPx5.visible = false;
   materials5.push(mPx5, mNx5, mPy5, mNy5, mPz5, mNz5);
   var tv5 = new THREE.Mesh(tvGeom5, materials5);
-
+	let frame6 = new THREE.Mesh (new THREE.BoxGeometry(2*1.01, 80*1.01, 70*1.01), new THREE.MeshLambertMaterial({map:frameMap, transparent:true}));
   var screen5 = new THREE.Mesh(new THREE.PlaneGeometry(70, 80),
     new THREE.MeshLambertMaterial({
       map: conTex5
@@ -556,7 +740,9 @@ function init() {
   tvGroup5.add(tv5, screen5);
   tvGroup5.rotation.y = Math.PI / 2;
   tvGroup5.position.set(-130, 70, 168);
-  scene.add(tvGroup5);
+  frame6.rotation.y = Math.PI / 2;
+  frame6.position.set(-130, 70, 168);
+  scene.add(tvGroup5,frame6);
 
   //draw齊白石 蝦
   var tvGroup6 = new THREE.Group();
@@ -628,7 +814,7 @@ function init() {
   mPx7.visible = false;
   materials7.push(mPx7, mNx7, mPy7, mNy7, mPz7, mNz7);
   var tv7 = new THREE.Mesh(tvGeom7, materials7);
-
+	let frame7 = new THREE.Mesh (new THREE.BoxGeometry(2*1.01, 60*1.01, 50*1.01), new THREE.MeshLambertMaterial({map:frameMap, transparent:true}));
   var screen7 = new THREE.Mesh(new THREE.PlaneGeometry(50, 60),
     new THREE.MeshLambertMaterial({
       map: conTex7
@@ -637,7 +823,8 @@ function init() {
   screen7.rotation.y = Math.PI / 2;
   tvGroup7.add(tv7, screen7);
   tvGroup7.position.set(-58, 70, 130);
-  scene.add(tvGroup7);
+  frame7.position.set(-58, 70, 130);
+  scene.add(tvGroup7,frame7);
 
 
   //draw陳進合奏
@@ -669,7 +856,8 @@ function init() {
   mPx8.visible = false;
   materials8.push(mPx8, mNx8, mPy8, mNy8, mPz8, mNz8);
   var tv8 = new THREE.Mesh(tvGeom8, materials8);
-
+  let frameMap2 = new THREE.TextureLoader().load ('https://i.imgur.com/nOV2bWh.png');
+	let frame8 = new THREE.Mesh (new THREE.BoxGeometry(2*1.01, 55*1.01, 95*1.01), new THREE.MeshLambertMaterial({map:frameMap1, transparent:true}));
   var screen8 = new THREE.Mesh(new THREE.PlaneGeometry(95, 55),
     new THREE.MeshLambertMaterial({
       map: conTex8
@@ -679,7 +867,9 @@ function init() {
   tvGroup8.add(tv8, screen8);
   tvGroup8.rotation.y = Math.PI / 2;
   tvGroup8.position.set(-140, 70, -32);
-  scene.add(tvGroup8);
+  frame8.rotation.y = Math.PI / 2;
+  frame8.position.set(-140, 70, -32);
+  scene.add(tvGroup8,frame8);
 
   //郭雪湖南街殷賑
   var tvGroup9 = new THREE.Group();
@@ -710,7 +900,8 @@ function init() {
   mPx9.visible = false;
   materials9.push(mPx9, mNx9, mPy9, mNy9, mPz9, mNz9);
   var tv9 = new THREE.Mesh(tvGeom9, materials9);
-
+	//i.imgur.com/nOV2bWh.png');
+	let frame9 = new THREE.Mesh (new THREE.BoxGeometry(2*1.01, 100*1.01, 50*1.01), new THREE.MeshLambertMaterial({map:frameMap1, transparent:true}));
   var screen9 = new THREE.Mesh(new THREE.PlaneGeometry(50, 100),
     new THREE.MeshLambertMaterial({
       map: conTex9
@@ -720,7 +911,9 @@ function init() {
   tvGroup9.add(tv9, screen9);
   tvGroup9.rotation.y = -(Math.PI / 2);
   tvGroup9.position.set(-140, 70, -168);
-  scene.add(tvGroup9);
+  frame9.rotation.y = -(Math.PI / 2);
+  frame9.position.set(-140, 70, -168);
+  scene.add(tvGroup9,frame9);
 
   //draw黃土水水牛群像
   var tvGroup10 = new THREE.Group();
@@ -751,7 +944,7 @@ function init() {
   mPx10.visible = false;
   materials10.push(mPx10, mNx10, mPy10, mNy10, mPz10, mNz10);
   var tv10 = new THREE.Mesh(tvGeom10, materials10);
-
+	let frame10 = new THREE.Mesh (new THREE.BoxGeometry(2*1.01, 60*1.01, 120*1.01), new THREE.MeshLambertMaterial({map:frameMap1, transparent:true}));
   var screen10 = new THREE.Mesh(new THREE.PlaneGeometry(120, 60),
     new THREE.MeshLambertMaterial({
       map: conTex10
@@ -760,14 +953,14 @@ function init() {
   screen10.rotation.y = Math.PI / 2;
   tvGroup10.add(tv10, screen10);
   tvGroup10.position.set(-197, 60, -100);
-  scene.add(tvGroup10);
+  frame10.position.set(-197, 60, -100);
+  scene.add(tvGroup10,frame10);
 
   //張大千荷塘野趣一
   var tvGroup11 = new THREE.Group();
 
   var tvGeom11 = new THREE.BoxGeometry(2, 60, 30);
   var materials11 = [];
-
   var conTex11 = loader.load('https://i.imgur.com/syzhTh0.jpg');
   let mPx11 = new THREE.MeshLambertMaterial({
     map: woodTex
@@ -1414,7 +1607,7 @@ function init() {
   var Spotlight8 = new Lamp(0, 135, -60, tvGroup6, 2, 1); //齊白石 蝦
   var Spotlight9 = new Lamp(-140, 135, -60, tvGroup8, 2, 3); //陳進合奏
   var Spotlight10 = new Lamp(-140, 135, -140, tvGroup9, 2, 1); //郭雪湖南街殷賑
-  var Spotlight11 = new Lamp(-160, 135, -100, tvGroup10, 2, 2); //黃土水水牛群像-左
+  var Spotlight11 = new Lamp(-160, 135, -100, tvGroup10, 2, 2); //黃土水水牛群像
 
   var t1 = new THREE.Mesh(new THREE.BoxGeometry(0.01, 60, 30), new THREE.MeshLambertMaterial());
   t1.position.set(-43, 50, -169.9);
@@ -1431,10 +1624,143 @@ function init() {
   var Spotlight16 = new Lamp(125, 135, 145, tvGroup17, 2, 3); //隸書
   var Spotlight17 = new Lamp(170, 135, 100, tvGroup18, 2, 4); //楷書
   var Spotlight18 = new Lamp(170, 135, 145, tvGroup19, 2, 3); //草書
-  var Spotlight19 = new Lamp(80, 135, 50, tvGroup20, 2, 1); //王羲之快雪時晴帖
-  var Spotlight20 = new Lamp(80, 135, 50, tvGroup20, 2, 1); //王羲之快雪時晴帖
-
+  var Spotlight19 = new Lamp(83, 135, 55, tvGroup20, 2, 1); //王羲之快雪時晴帖
+  var Spotlight20 = new Lamp(130, 135, 100, jadeAssembly, 2, 5); //玉石
+  var Spotlight21 = new Lamp(100, 135, -145, tvGroup21, 2, 1); //清明上河圖1
+  var Spotlight22 = new Lamp(165, 135, -145, tvGroup22, 2, 1); //清明上河圖2
+  var Spotlight23 = new Lamp(170, 135, -135, tvGroup23, 2, 4); //清明上河圖3
+  var Spotlight24 = new Lamp(170, 135, -80, tvGroup24, 2, 4); //清明上河圖4
+  var Spotlight25 = new Lamp(170, 135, -10, tvGroup25, 2, 4); //清明上河圖5
+	
+    $('#turn').change(function() {
+    Spotlight1.turnLight($(this).val());
+    Spotlight2.turnLight($(this).val());
+    Spotlight3.turnLight($(this).val());
+    Spotlight4.turnLight($(this).val());
+    Spotlight5.turnLight($(this).val());
+    Spotlight6.turnLight($(this).val());
+    Spotlight7.turnLight($(this).val());
+    Spotlight8.turnLight($(this).val());
+    Spotlight9.turnLight($(this).val());
+    Spotlight10.turnLight($(this).val());
+    Spotlight11.turnLight($(this).val());
+    Spotlight12.turnLight($(this).val());
+    Spotlight13.turnLight($(this).val());
+    Spotlight14.turnLight($(this).val());
+    Spotlight15.turnLight($(this).val());
+    Spotlight16.turnLight($(this).val());
+    Spotlight17.turnLight($(this).val());
+    Spotlight18.turnLight($(this).val());
+    Spotlight19.turnLight($(this).val());
+    Spotlight20.turnLight($(this).val());
+    Spotlight21.turnLight($(this).val());
+    Spotlight22.turnLight($(this).val());
+    Spotlight23.turnLight($(this).val());
+    Spotlight24.turnLight($(this).val());
+    Spotlight25.turnLight($(this).val());
+  });	
 }
+var watch;
+$("#the_btn1").on("click", function(){
+  watch = ( $("select[name='draw']").val() ); 
+  if(watch ==0){
+  camera.position.set(0, 400, 500);
+  camera.lookAt(0, 0, 0);
+  }
+  if(watch == 1){
+  camera.position.set(10,70,-20);
+  camera.lookAt(-40,50,-20);
+  camera.rotation.y = Math.PI / 2;
+  }
+  if(watch == 2){
+  camera.position.set(-90,65,120);
+  camera.lookAt(-140,50,120);
+  camera.rotation.y = Math.PI / 2;
+  }
+  if(watch == 3){
+  camera.position.set(-90,65,30);
+  camera.lookAt(-140,50,30);
+  camera.rotation.y = Math.PI / 2;
+  }
+  if(watch == 4){
+  camera.position.set(-130,65,60);
+	camera.lookAt(-130,65,125);
+  }
+  if(watch == 5){
+  camera.position.set(-160,65,120);
+	camera.lookAt(-130,65,120);
+  }
+  if(watch == 6){
+  camera.position.set(-140,65,70);
+	camera.lookAt(-140,65,20);
+  }
+  if(watch == 7){
+  camera.position.set(20,65,130);
+	camera.lookAt(-20,65,130);
+  }
+  if(watch == 8){
+  camera.position.set(0,65,-10);
+	camera.lookAt(0,65,-60);
+  }
+  if(watch == 12){
+  camera.position.set(-43,56,-80);
+	camera.lookAt(-43,56,-130);
+  }
+  if(watch == 15){
+  camera.position.set(38,56,-80);
+	camera.lookAt(30,56,-168);
+  }
+  if(watch == 9){
+  camera.position.set(-140,65,-140);
+	camera.lookAt(-140,65,-60);
+  }
+  if(watch == 10){
+  camera.position.set(-140,65,-35);
+	camera.lookAt(-140,65,-140);
+  }
+  if(watch == 11){
+  camera.position.set(-80,60,-100);
+	camera.lookAt(-160,60,-100);
+  }
+  if(watch == 16){
+  camera.position.set(150,65,140);
+	camera.lookAt(80,65,140);
+  }
+  if(watch == 17){
+  camera.position.set(85,65,100);
+	camera.lookAt(85,65,145);
+  }
+  if(watch == 18){
+  camera.position.set(90,65,100);
+	camera.lookAt(125,65,145);
+  }
+  if(watch == 19){
+  camera.position.set(120,65,20);
+	camera.lookAt(170,65,60);
+  }
+  if(watch == 21){
+  camera.position.set(80,65,120);
+	camera.lookAt(80,65,50);
+  }
+  if(watch == 22){
+  camera.position.set(70,65,120);
+	camera.lookAt(130,65,100);
+  }
+  if(watch == 23){
+  camera.position.set(132.5,65,-50);
+	camera.lookAt(132.5,65,-145);
+  }
+  if(watch == 24){
+  camera.position.set(80,65,-80);
+	camera.lookAt(170,65,-115);
+  }
+  if(watch == 25){
+  camera.position.set(80,65,-100);
+	camera.lookAt(170,65,-65);
+  }
+  
+});
+
 
 function buildFloor() {
   var floor = new THREE.Group();
@@ -1463,8 +1789,16 @@ function buildBoard(w, h, d) {
 
   return mesh;
 
-
 }
+
+function buildPole(w, h, d) {
+  let pole;
+  pole = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({
+    color: 0x000000
+  }));
+  return pole;
+}
+
 //width,height,depth
 function buildOutWalls(w, h, d) {
   let wall;
@@ -1516,13 +1850,14 @@ function buildChair() {
 }
 
 function animate() {
-  let cameraRoot = camera.position.clone();
-  cameraRoot.y = 0;
+
   requestAnimationFrame(animate);
+
   renderer.render(scene, camera);
-  //grasses.forEach (function(t) {t.lookAt (cameraRoot)})
-  //spotLightHelper.update();
+
+	
 }
+
 </script>
 </body>
 </html>
