@@ -38,7 +38,7 @@ body {
 <option value="80"></option>
 <option value="90"></option>
 <option value="100"></option>
-</datalist>電源開關
+</datalist>聚光燈開關
 <input type="range" id='turn' min=0 max=1  >
 
 <select id="draw" name="draw">
@@ -76,8 +76,6 @@ body {
     <option value = 25 >清明上河圖右二</option>
   </optgroup>
 </select>
-
-<button type="button" id="the_btn1">觀賞</button>
 <script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -627,7 +625,7 @@ function init() {
   
 }
 var watch;
-$("#the_btn1").on("click", function(){
+$("#draw").change( function(){
   watch = ( $("select[name='draw']").val() ); 
   if(watch ==0){
   camera.position.set(0, 400, 500);
@@ -901,10 +899,10 @@ function buildChair() {
 }
 
 function animate() {
-
   requestAnimationFrame(animate);
   renderer.render(scene, camera);	
 }
+
 </script>
 </body>
 </html>
