@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<style>
+#info {
+  position: absolute;
+  top: 10px;
+  width: 100%;
+  padding: 5px;
+  text-align: center;
+  font-size:20px;
+  color: #ffff00
+}
+
+body {
+  overflow: hidden;
+}
+</style>
+
+</head>
+
+<body> 
+
+<div id="info">Train HW<br>
+<a href='javascript:toggleTurn();'>toggle </a>
+</div>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js">
+</script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<script>
+var scene, renderer, camera;
+var mesh, angle = 0;
+var turn = false;
+var group = new THREE.Group();
+
+init();
+animate();
+
+function toggleTurn() {
+  turn = !turn;
+}
+
+function init() {
+
+  renderer = new THREE.WebGLRenderer();
+  document.body.appendChild(renderer.domElement);
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+  renderer.setSize(width, height);
+
+  scene = new THREE.Scene();
+  var grid = new THREE.GridHelper(20, 20, 'white', 'white');
+  scene.add(grid);
+  var axes = new THREE.AxesHelper(5);
+  scene.add(axes);
+
+  renderer.setClearColor(0x888888);
+
+  camera = new THREE.PerspectiveCamera(35, width / height, 1, 100);
+
+  camera.position.y = 16;
+  camera.position.z = 40;
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  window.addEventListener('resize', onWindowResize, false);
+
+  var cubeGeometry = new THREE.BoxGeometry(1.25, 1, 2);
+  var cubeMaterial = new THREE.MeshBasicMaterial({
+    color: 0x64BD
+  });
+  cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+  //車廂
+  var head = cube.clone();
+  var tail = cube.clone();
+  cube.position.set(0.79, 0.07, 2.25);
+  cube.rotation.y = (Math.PI / 2);
+  tail.position.set(1, 0.25, 0);
+  head.position.set(0.75, 0.25, 2.3);
+  head.rotation.y = -(Math.PI / 18);
+
+  //車廂車輪
+  var wheelGeometry = new THREE.TorusGeometry(0.25, 0.15, 30, 100);
+  var wheelMaterial = new THREE.MeshBasicMaterial({
+    color: 0x10
+  });
+  wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+  wheel.rotation.y = (Math.PI / 2);
+
+  var wheel1 = wheel.clone();
+  wheel1.position.set(0.3, -0.1, 0.5);
+  var wheel2 = wheel.clone();
+  wheel2.position.set(1.7, -0.1, 0.5);
+  var wheel3 = wheel.clone();
+  wheel3.position.set(0.3, -0.1, -0.5);
+  var wheel4 = wheel.clone();
+  wheel4.position.set(1.7, -0.1, -0.5);
+
+  //連接線
+  var linkGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1);
+  var linkMaterial = new THREE.MeshBasicMaterial({
+    color: 0XE7FF
+  });
+
+  link = new THREE.Mesh(linkGeometry, linkMaterial);
+  link.rotation.x = (Math.PI / 2);
+  link.rotation.z = (Math.PI / 18);
+  var link1 = link.clone();
+  link1.position.set(0.75, 0, 0.85);
+  var link2 = link.clone();
+  link2.position.set(1.35, 0, 0.95);
+
+  //火車前面板子
+  var headGeometry = new THREE.BoxGeometry(1.35, 0.35, 1.5);
+  var headMaterial = new THREE.MeshBasicMaterial({
+    color: 0x92C
+  });
+
+  headdress = new THREE.Mesh(headGeometry, headMaterial);
+  var hd = headdress.clone();
+  hd.position.set(0.5, -0.05, 4);
+  hd.rotation.y = -(Math.PI / 18);
+
+  //車掌車廂
+  var mainGeometry = new THREE.BoxGeometry(1.25, 1, 2);
+  var mainMaterial = new THREE.MeshBasicMaterial({
+    color: 0x64BD
+  });
+  maincar = new THREE.Mesh(mainGeometry, mainMaterial);
+  var mc = maincar.clone();
+  mc.position.set(0.7, 1.1, 2.5);
+  mc.rotation.y = -(Math.PI / 18);
+
+  //車頭
+  var faceGeometry = new THREE.CylinderGeometry(0.6, 0.6, 1.5, 38);
+  var faceMaterial = new THREE.MeshBasicMaterial({
+    color: 0x808080
+  });
+  face = new THREE.Mesh(faceGeometry, faceMaterial);
+  var face1 = face.clone();
+  face1.rotation.x = (Math.PI / 2);
+  face1.rotation.z = (Math.PI / 18);
+  face1.position.set(0.55, 0.8, 3.5);
+
+  //火車頭車輪
+  var headwheelGeometry = new THREE.TorusGeometry(0.25, 0.15, 30, 100);
+  var headwheelMaterial = new THREE.MeshBasicMaterial({
+    color: 0x10
+  });
+  hw = new THREE.Mesh(headwheelGeometry, headwheelMaterial);
+  hw.rotation.y = (Math.PI / 2.25);
+  var hw1 = hw.clone();
+  hw1.position.set(1.15, -0.1, 3.35);
+  var hw2 = hw.clone();
+  hw2.position.set(0, -0.1, 3.2);
+  var hw3 = hw.clone();
+  hw3.position.set(1.35, -0.1, 2.5);
+  var hw4 = hw.clone();
+  hw4.position.set(0.15, -0.1, 2.35);
+  var hw5 = hw.clone();
+  hw5.position.set(1.5, -0.1, 1.65);
+  var hw6 = hw.clone();
+  hw6.position.set(0.3, -0.1, 1.5);
+
+  //煙囪柱子
+  var chimneyGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1, 38);
+  var chimneyMaterial = new THREE.MeshBasicMaterial({
+    color: 0x000000
+  });
+  chimney = new THREE.Mesh(chimneyGeometry, chimneyMaterial);
+  var cy = chimney.clone();
+  cy.position.set(0.575, 1.75, 3.15);
+
+  //煙囪環
+  var cyringGeometry = new THREE.CylinderGeometry(0.45, 0.45, 0.25, 38);
+  var cyringMaterial = new THREE.MeshBasicMaterial({
+    color: 0x000000
+  });
+  chimneyring = new THREE.Mesh(cyringGeometry, cyringMaterial);
+  var cyr = chimneyring.clone();
+  cyr.position.set(0.575, 2.15, 3.15);
+
+	//車燈
+  var lightGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.1, 38);
+  var lightMaterial = new THREE.MeshBasicMaterial({
+    color: 0xFFFF00
+  });
+  light = new THREE.Mesh(lightGeometry, lightMaterial);
+  var light1 = light.clone();
+  light1.rotation.x = (Math.PI / 2);
+  light1.rotation.z = (Math.PI / 18);
+  light1.position.set(0.1, 1.4, 3.5);
+  var light2 = light.clone();
+  light2.rotation.x = (Math.PI / 2);
+  light2.rotation.z = (Math.PI / 18);
+  light2.position.set(1, 1.4, 3.65);
+  
+  //眼睛
+  var eyeGeometry = new THREE.CircleGeometry( 0.1, 32 );
+  var eyeMaterial = new THREE.MeshBasicMaterial({
+    color: 0x10
+  });
+  eye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+  eye.rotation.y = -(Math.PI / 18);
+  var eye1=eye.clone();
+  eye1.position.set(0.1,1,4.2);
+  var eye2=eye.clone();
+  eye2.position.set(0.75,1,4.35);
+  
+ 	//表情
+  var emoGeometry = new THREE.CylinderGeometry( 0.05,0.05,0.7,32 );
+  var emoMaterial = new THREE.MeshBasicMaterial({
+    color: 0x10
+  });
+  emo = new THREE.Mesh(emoGeometry, emoMaterial);
+  emo.rotation.z = (Math.PI / 2);
+  emo.position.set(0.45,0.5,4.25);
+  emo.rotation.y = -(Math.PI / 18);
+  
+  group.add(head, tail);
+  group.add(wheel1, wheel2, wheel3, wheel4);
+  group.add(link1, link2);
+  group.add(hd, mc);
+  group.add(face1);
+  group.add(hw1, hw2, hw3, hw4, hw5, hw6);
+  group.add(cy, cyr);
+  group.add(light1,light2);
+  group.add(eye1,eye2);
+  group.add(emo);
+  scene.add(group);
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function animate() {
+  if (turn)
+    angle += 0.01;
+  group.position.set(8 * Math.cos(angle), 0.5, 8 * Math.sin(angle));
+  group.rotation.y = -angle;
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+
+</script>
+</body>
+
+</html>
