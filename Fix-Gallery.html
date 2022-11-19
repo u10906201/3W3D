@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<style>
+#info {
+  position: absolute;
+  top: 10px;
+  width: 100%;
+  padding: 5px;
+  text-align: center;
+  font-size:20px;
+  color: #ffff00
+}
+
+body {
+  margin =0;
+  overflow: hidden;
+  background=url("https://i.imgur.com/Zb0PeN3.jpg") center no-repeat;
+  background-size:cover;
+}
+
+</style>
+</head>
+
+<body> 
+<div>亮度
+<input type="range" id='light' list="tickmarks"></div>
+<datalist id="tickmarks">
+<option value="0"></option>
+<option value="10"></option>
+<option value="20"></option>
+<option value="30"></option>
+<option value="40"></option>
+<option value="50"></option>
+<option value="60"></option>
+<option value="70"></option>
+<option value="80"></option>
+<option value="90"></option>
+<option value="100"></option>
+</datalist>聚光燈開關
+<input type="range" id='turn' min=0 max=1  >&emsp;&emsp;
+<button id='zero'style="position:absolute;left: 18vw;top:0.5vw; width:10vw; height: 3vw">鳥瞰</button><br>世界名畫
+<button id='one'>梵谷-耳朵綁上繃帶的自畫像</button>
+<button id='two'>梵谷-自畫像</button>
+<button id='three'>達文西-蒙娜麗莎的微笑</button>&emsp;水墨畫
+<button id='four'>張大千-荷塘野趣一二</button>
+<button id='five'>張大千-荷塘野趣三四</button>&emsp;台灣畫家
+<button id='six'>黃土水-水牛群像</button>&emsp;漢文化
+<button id='seven'>楷書</button>
+<button id='eight'>古玉</button><br>清明上河圖
+<button id='nine'>清明上河圖左</button>
+<button id='ten'>清明上河圖右一</button>
+<button id='ele'>清明上河圖右二</button>
+
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://jyunming-chen.github.io/tutsplus/js/KeyboardState.js"></script>
+
+<script>
+class Lamp {
+  constructor(x, y, z, paint, type, turn) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+
+    if (type === 1) {
+      this.Light = new THREE.PointLight(0xffffff, 0.25);
+      this.Light.position.set(this.x, this.y, this.z);
+      scene.add(this.Light);
+
+      var Lampgeometry = new THREE.CylinderGeometry(4, 4, 1);
+      var Lampmaterial = new THREE.MeshBasicMaterial({
+        color: 0x4F4F4F
+      });
+      var PointLightLamp = new THREE.Mesh(Lampgeometry, Lampmaterial);
+      PointLightLamp.position.set(this.x, this.y, this.z);
+      scene.add(PointLightLamp);
+    } else if (type === 2) {
+      this.Light = new THREE.SpotLight(0xffffff, 1.35, 150, -(Math.PI / 5), 0.974);
+      this.Light.position.set(this.x, this.y, this.z);
+      this.Light.target = paint;
+      scene.add(this.Light);
+
+      let geometry = new THREE.CylinderGeometry(2, 3, 6);
+      let material = new THREE.MeshBasicMaterial({
+        color: 0x7B7B7B
+      });
+      var spotLightLamp = new THREE.Mesh(geometry, material);
+      spotLightLamp.position.set(this.x, this.y, this.z);
+      if (turn === 1) {
+        spotLightLamp.rotation.z = (Math.PI / 4);
+        spotLightLamp.rotation.y = (Math.PI / 2);
+        scene.add(spotLightLamp);
+      } else if (turn === 2) {
+        spotLightLamp.rotation.z = -(Math.PI / 4);
+        scene.add(spotLightLamp);
+      } else if (turn === 3) {
+        spotLightLamp.rotation.z = (Math.PI / 4);
+        spotLightLamp.rotation.y = -(Math.PI / 2);
+        scene.add(spotLightLamp);
+      } else if (turn === 4) {
+        spotLightLamp.rotation.z = (Math.PI / 4);
+        scene.add(spotLightLamp);
+      } else if (turn === 5) {
+        scene.add(spotLightLamp);
+      }
+    }
+  }
+
+  changeLight(i) {
+    this.Light.intensity = i / 200;
+  }
+
+  turnLight(j) {
+    if (j == 0) {
+      this.Light.intensity = 0;
+    } else {
+      this.Light.intensity = 1.3;
+    }
+  }
+}
+
+var camera, scene, renderer, eyecamera;
+var loader = new THREE.TextureLoader();
+var woodTex = loader.load("https://i.imgur.com/oAQD9wh.jpg");
+var alpha = 0;
+var keyboard = new KeyboardState();
+init();
+animate();
+
+function init() {
+
+  scene = new THREE.Scene();
+	clock = new THREE.Clock();
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x888888);
+  document.body.appendChild(renderer.domElement);
+
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
+  camera.position.set(0, 400, 500); // camera at (0,0,500)
+  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  ////////////////////////////////////////////////////////
+
+  var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
+
+  //DirectionalLight方向光	
+  let dl = new THREE.DirectionalLight(0xdddddd, 0.1); // color, intensity, distance, decay
+  dl.position.y = 15;
+  scene.add(dl);
+
+  //Pointlight
+  var PointLight1 = new Lamp(130, 125, 100, 0, 1, 0); //右下
+  var PointLight2 = new Lamp(130, 125, -60, 0, 1, 0); //右上
+  var PointLight3 = new Lamp(0, 125, 20, 0, 1, 0); //中間 
+  var PointLight4 = new Lamp(0, 125, -125, 0, 1, 0); //中上
+  var PointLight5 = new Lamp(-130, 125, 50, 0, 1, 0); //左下
+  var PointLight6 = new Lamp(-130, 125, -100, 0, 1, 0); //左上
+
+  $('#light').change(function() {
+    PointLight1.changeLight($(this).val());
+    PointLight2.changeLight($(this).val());
+    PointLight3.changeLight($(this).val());
+    PointLight4.changeLight($(this).val());
+    PointLight5.changeLight($(this).val());
+    PointLight6.changeLight($(this).val());
+  });
+
+
+  //floor
+  var floor1 = buildFloor();
+  scene.add(floor1);
+
+  //outwalls
+  var wall1 = buildOutWalls(125, 0.5, 400);
+  wall1.rotation.y = Math.PI / 2;
+  wall1.rotation.z = Math.PI / 2;
+  wall1.position.set(0, 62.5, -170);
+  var wall2 = wall1.clone();
+  wall1.position.set(0, 62.5, 170);
+  scene.add(wall1, wall2);
+
+  var wall3 = buildOutWalls(125, 0.5, 340);
+  wall3.rotation.z = Math.PI / 2;
+  wall3.position.set(-200, 62.5, 0);
+  var wall4 = wall3.clone();
+  wall4.position.set(200, 62.5, 0);
+  scene.add(wall3, wall4);
+
+  //Inwalls
+  var wall5 = buildInWalls(125, 1, 80);
+  wall5.rotation.z = Math.PI / 2;
+  wall5.position.set(-60, 62.5, 130);
+  scene.add(wall5);
+
+  var wall6 = buildInWalls(125, 1, 60);
+  wall6.rotation.z = Math.PI / 2;
+  wall6.position.set(-80, 62.5, 0);
+  scene.add(wall6);
+
+  var wall7 = buildOutWalls(125, 1, 120);
+  wall7.rotation.y = Math.PI / 2;
+  wall7.rotation.z = Math.PI / 2;
+  wall7.position.set(-140, 62.5, -30);
+  scene.add(wall7);
+
+  var wall8 = buildInWalls(125, 1, 40);
+  wall8.rotation.z = Math.PI / 2;
+  wall8.position.set(-80, 62.5, -50);
+  var wall9 = wall8.clone();
+  wall8.position.set(-80, 62.5, -150);
+  scene.add(wall8, wall9);
+
+  var wall10 = buildInWalls(125, 1, 60);
+  wall10.rotation.z = Math.PI / 2;
+  wall10.position.set(60, 62.5, 140);
+  scene.add(wall10);
+
+  var wall11 = buildInWalls(125, 1, 20);
+  wall11.rotation.z = Math.PI / 2;
+  wall11.position.set(60, 62.5, 40);
+  var wall12 = wall11.clone();
+  wall12.position.set(60, 62.5, -20);
+  var wall13 = wall11.clone();
+  wall13.position.set(60, 62.5, -100);
+  var wall14 = wall11.clone();
+  wall14.position.set(60, 62.5, -160);
+  scene.add(wall11, wall12, wall13, wall14);
+
+  var wall15 = buildInWalls(125, 1, 40);
+  wall15.rotation.y = Math.PI / 2;
+  wall15.rotation.z = Math.PI / 2;
+  wall15.position.set(180, 62.5, 30);
+  var wall16 = wall15.clone();
+  wall16.position.set(80, 62.5, 30);
+  scene.add(wall15, wall16);
+
+
+  //booth
+  var booth = buildBooth();
+  var booth1 = booth.clone();
+  booth1.position.set(130, 25, 100);
+  scene.add(booth1);
+
+  //chair
+  var chair = buildChair();
+  var chair1 = chair.clone();
+  chair1.rotation.y = Math.PI / 2;
+  chair1.position.set(-65, 0, -20);
+
+  var chair2 = chair.clone();
+  chair2.position.set(-140, 0, -15);
+  scene.add(chair1, chair2);
+
+  var chair3 = chair.clone();
+  chair3.position.set(130, 0, -60);
+  chair3.rotation.y = Math.PI / 2;
+  scene.add(chair3);
+
+  //pillar
+  var pillar = buildPillar();
+  pillar.position.set(0, 62.5, -100);
+  scene.add(pillar);
+
+  //board
+  var board1 = buildBoard(4, 5, 81);
+  board1.position.set(-60, 2.5, 129.5);
+  scene.add(board1);
+  var board2 = buildBoard(4, 5, 62);
+  board2.position.set(-80, 2.5, 0);
+  scene.add(board2);
+  var board3 = buildBoard(4, 5, 121);
+  board3.rotation.y = Math.PI / 2;
+  board3.position.set(-139, 2.5, -30);
+  scene.add(board3);
+  var board4 = buildBoard(4, 5, 42);
+  board4.position.set(-80, 2.5, -149);
+  scene.add(board4);
+  var board5 = buildBoard(4, 5, 42);
+  board5.position.set(-80, 2.5, -50);
+  scene.add(board5);
+  var board6 = buildBoard(4, 5, 61);
+  board6.position.set(60, 2.5, 139.5);
+  scene.add(board6);
+  var board7 = buildBoard(4, 5, 22);
+  board7.position.set(60, 2.5, 40);
+  scene.add(board7);
+  var board8 = buildBoard(4, 5, 22);
+  board8.position.set(60, 2.5, -20);
+  scene.add(board8);
+  var board9 = buildBoard(4, 5, 22);
+  board9.position.set(60, 2.5, -100);
+  scene.add(board9);
+  var board10 = buildBoard(4, 5, 22);
+  board10.position.set(60, 2.5, -159);
+  scene.add(board10);
+
+  var board11 = buildBoard(4, 5, 42);
+  board11.position.set(179, 2.5, 30);
+  board11.rotation.y = Math.PI / 2;
+  scene.add(board11);
+  var board12 = buildBoard(4, 5, 41);
+  board12.rotation.y = Math.PI / 2;
+  board12.position.set(80, 2.5, 29.5);
+  scene.add(board12);
+
+  var board13 = buildBoard(4, 4, 399);
+  board13.rotation.y = Math.PI / 2;
+  board13.position.set(0, 2.5, -168);
+  scene.add(board13);
+  var board14 = buildBoard(4, 4, 399);
+  board14.rotation.y = Math.PI / 2;
+  board14.position.set(0, 2.5, 168);
+  scene.add(board14);
+  var board15 = buildBoard(4, 4, 338);
+  board15.position.set(-198, 2.5, 0);
+  scene.add(board15);
+  var board16 = buildBoard(4, 4, 338);
+  board16.position.set(198, 2.5, 0);
+  scene.add(board16);
+
+  var board17 = buildBoard(42, 5, 22);
+  board17.position.set(0, 2.5, -100);
+  scene.add(board17);
+
+  //Pole
+  var pole1 = buildPole(3, 3, 20);
+  pole1.position.set(-130, 139, 120);
+  scene.add(pole1);
+  var pole2 = buildPole(3, 3, 20);
+  pole2.position.set(-130, 139, 120);
+  pole2.rotation.y = Math.PI / 2;
+  scene.add(pole2);
+  var pole3 = buildPole(1, 1, 60);
+  pole3.position.set(-130, 169, 120);
+  pole3.rotation.x = Math.PI / 2;
+  scene.add(pole3);
+
+  var pole4 = buildPole(3, 3, 20);
+  pole4.position.set(-140, 139, 30);
+  scene.add(pole4);
+  var pole5 = buildPole(3, 3, 20);
+  pole5.position.set(-140, 139, 30);
+  pole5.rotation.y = Math.PI / 2;
+  scene.add(pole5);
+  var pole6 = buildPole(1, 1, 60);
+  pole6.position.set(-140, 169, 30);
+  pole6.rotation.x = Math.PI / 2;
+  scene.add(pole6);
+
+  var pole7 = buildPole(3, 3, 90);
+  pole7.position.set(-140, 139, -100);
+  scene.add(pole7);
+  var pole8 = buildPole(3, 3, 40);
+  pole8.position.set(-140, 139, -100);
+  pole8.rotation.y = Math.PI / 2;
+  scene.add(pole8);
+  var pole9 = buildPole(1, 1, 60);
+  pole9.position.set(-140, 169, -100);
+  pole9.rotation.x = Math.PI / 2;
+  scene.add(pole9);
+
+  var pole10 = buildPole(3, 3, 5);
+  pole10.position.set(-20, 139, 130);
+  scene.add(pole10);
+  var pole11 = buildPole(1, 1, 60);
+  pole11.position.set(-20, 169, 130);
+  pole11.rotation.x = Math.PI / 2;
+  scene.add(pole11);
+
+  var pole12 = buildPole(3, 3, 5);
+  pole12.position.set(-40, 139, -20);
+  scene.add(pole12);
+  var pole13 = buildPole(1, 1, 60);
+  pole13.position.set(-40, 169, -20);
+  pole13.rotation.x = Math.PI / 2;
+  scene.add(pole13);
+
+  var pole14 = buildPole(3, 3, 5);
+  pole14.position.set(0, 139, -60);
+  scene.add(pole14);
+  var pole15 = buildPole(1, 1, 60);
+  pole15.position.set(0, 169, -60);
+  pole15.rotation.x = Math.PI / 2;
+  scene.add(pole15);
+
+  var pole16 = buildPole(3, 3, 80);
+  pole16.position.set(-11, 139, -130);
+  pole16.rotation.y = Math.PI / 2;
+  scene.add(pole16);
+  var pole17 = buildPole(1, 1, 60);
+  pole17.position.set(-43, 169, -130);
+  pole17.rotation.x = Math.PI / 2;
+  scene.add(pole17);
+  var pole18 = buildPole(1, 1, 60);
+  pole18.position.set(21, 169, -130);
+  pole18.rotation.x = Math.PI / 2;
+  scene.add(pole18);
+
+  var pole19 = buildPole(3, 3, 90);
+  pole19.position.set(127, 139, 145);
+  pole19.rotation.y = Math.PI / 2;
+  scene.add(pole19);
+  var pole20 = buildPole(1, 1, 60);
+  pole20.position.set(83, 169, 145);
+  pole20.rotation.x = Math.PI / 2;
+  scene.add(pole20);
+  var pole21 = buildPole(3, 3, 90);
+  pole21.position.set(170, 139, 100);
+  scene.add(pole21);
+  var pole22 = buildPole(3, 3, 90);
+  pole22.position.set(83, 139, 100);
+  scene.add(pole22);
+  var pole23 = buildPole(1, 1, 60);
+  pole23.position.set(171, 169, 145);
+  pole23.rotation.x = Math.PI / 2;
+  scene.add(pole23);
+  var pole24 = buildPole(3, 3, 90);
+  pole24.position.set(127, 139, 100);
+  pole24.rotation.y = Math.PI / 2;
+  scene.add(pole24);
+  var pole25 = buildPole(3, 3, 90);
+  pole25.position.set(127, 139, 100);
+  scene.add(pole25);
+  var pole26 = buildPole(3, 3, 90);
+  pole26.position.set(127, 139, 55);
+  pole26.rotation.y = Math.PI / 2;
+  scene.add(pole26);
+  var pole27 = buildPole(1, 1, 60);
+  pole27.position.set(83, 169, 55);
+  pole27.rotation.x = Math.PI / 2;
+  scene.add(pole27);
+  var pole28 = buildPole(1, 1, 60);
+  pole28.position.set(170, 169, 55);
+  pole28.rotation.x = Math.PI / 2;
+  scene.add(pole28);
+  var pole29 = buildPole(1, 1, 60);
+  pole29.position.set(130, 169, 100);
+  pole29.rotation.x = Math.PI / 2;
+  scene.add(pole29);
+
+  var pole30 = buildPole(3, 3, 75);
+  pole30.position.set(132.5, 139, -145);
+  pole30.rotation.y = Math.PI / 2;
+  scene.add(pole30);
+  var pole31 = buildPole(1, 1, 60);
+  pole31.position.set(100, 169, -145);
+  pole31.rotation.x = Math.PI / 2;
+  scene.add(pole31);
+  var pole32 = buildPole(1, 1, 60);
+  pole32.position.set(165, 169, -145);
+  pole32.rotation.x = Math.PI / 2;
+  scene.add(pole32);
+  var pole33 = buildPole(3, 3, 135);
+  pole33.position.set(170, 139, -72.5);
+  scene.add(pole33);
+  var pole34 = buildPole(1, 1, 60);
+  pole34.position.set(170, 169, -135);
+  pole34.rotation.x = Math.PI / 2;
+  scene.add(pole34);
+  var pole35 = buildPole(1, 1, 60);
+  pole35.position.set(170, 169, -10);
+  pole35.rotation.x = Math.PI / 2;
+  scene.add(pole35);
+
+  //link,畫框,面向,方向
+  var p2 = buildDraws(2, 70, 60, -197, 70, 120, 'https://i.imgur.com/hMa7bbW.jpg', 1, 1, 0); //梵谷割耳
+  var p3 = buildDraws(2, 70, 60, -197, 70, 30, 'https://i.imgur.com/M7gM2Qf.jpg', 1, 1, 0); //梵谷
+  var p4 = buildDraws(2, 80, 70, -130, 70, 168, 'https://i.imgur.com/o52TpXn.jpg', 1, 1, 1); //蒙娜麗莎
+  var p9 = buildDraws(2, 60, 30, -59, 60, -168, 'https://i.imgur.com/syzhTh0.jpg', 0, 1, 2); //張大千荷塘野趣一
+  var p10 = buildDraws(2, 60, 30, -27, 60, -168, 'https://i.imgur.com/LPqVvK2.jpg', 0, 1, 2); //張大千荷塘野趣二
+  var p11 = buildDraws(2, 60, 30, 5, 60, -168, 'https://i.imgur.com/67ftDUE.jpg', 0, 1, 2); //張大千荷塘野趣三
+  var p12 = buildDraws(2, 60, 30, 37, 60, -168, 'https://i.imgur.com/SLocsOb.jpg', 0, 1, 2); //張大千荷塘野四
+  var p15 = buildDraws(2, 60, 120, -197, 60, -100, 'https://i.imgur.com/GBBdHeq.jpg', 2, 1, 0); //黃土水水牛群像
+  var p20 = buildDraws(2, 60, 120, 199, 70, 100, 'https://i.imgur.com/vskVtTl.jpg', 0, 2, 0); //楷書
+  var p22 = buildDraws(2, 65, 65, 100, 70, -169, 'https://i.imgur.com/7mlWzT3.jpg', 0, 1, 2); //清明上河圖卷1
+  var p23 = buildDraws(2, 65, 65, 165, 70, -169, 'https://i.imgur.com/jezwz71.jpg', 0, 1, 2); //清明上河圖卷2
+  var p24 = buildDraws(2, 65, 65, 199, 70, -139, 'https://i.imgur.com/cTUCTtv.jpg', 0, 2, 0); //清明上河圖卷3
+  var p25 = buildDraws(2, 65, 65, 199, 70, -74.5, 'https://i.imgur.com/dQit1Ko.jpg', 0, 2, 0); //清明上河圖卷4
+  var p26 = buildDraws(2, 65, 65, 199, 70, -9.5, 'https://i.imgur.com/rbCt7us.jpg', 0, 2, 0); //清明上河圖卷5
+
+  //玉石
+  let loader3 = new THREE.TextureLoader();
+  loader3.crossOrigin = '';
+
+  let jadeAssembly = new THREE.Object3D();
+
+  let treadTex = loader3.load('https://i.imgur.com/aHeqdXm.jpg');
+  treadTex.repeat.set(6, 1)
+  treadTex.wrapS = THREE.RepeatWrapping
+  let treadMat = new THREE.MeshLambertMaterial({
+    map: treadTex,
+    side: THREE.DoubleSide
+  });
+  let geometry = new THREE.CylinderGeometry(20, 20, 10, 80, 2, true)
+  let tread = new THREE.Mesh(geometry, treadMat);
+  // parameters need to be set in initial instantiation
+  let geometry1 = new THREE.CylinderGeometry(12, 12, 10, 80, 2, true)
+  let tread1 = new THREE.Mesh(geometry1, treadMat);
+  jadeAssembly.add(tread, tread1);
+
+  let jadeTex = loader.load('https://i.imgur.com/ukwK50f.png');
+  let jadeMat = new THREE.MeshLambertMaterial({
+    map: jadeTex,
+    transparent: true,
+    side: THREE.DoubleSide
+  })
+  let jade = new THREE.Mesh(new THREE.CircleGeometry(20, 80), jadeMat)
+  let jade1 = jade.clone();
+  jadeAssembly.add(jade1)
+  jade1.rotation.x = -Math.PI / 2;
+  jade1.position.y = 5
+  let jade2 = jade.clone();
+  jade2.rotation.x = Math.PI / 2
+  jade2.position.y = -5
+  jadeAssembly.add(jade2)
+  scene.add(jadeAssembly);
+  jadeAssembly.rotation.x = Math.PI / 2
+  jadeAssembly.rotation.z = Math.PI / 2
+  jadeAssembly.position.set(130, 70, 100);
+
+  //Spotlight
+  //w1 a2 s3 d4 中間5(方向)
+
+  var Spotlight2 = new Lamp(-140, 135, 120, p2, 2, 2); //梵谷割耳
+  var Spotlight3 = new Lamp(-140, 135, 30, p3, 2, 2); //梵谷
+  var Spotlight4 = new Lamp(-130, 135, 125, p4, 2, 3); //蒙娜麗莎
+  var Spotlight11 = new Lamp(-160, 135, -100, p15, 2, 2); //黃土水水牛群像
+
+  var t1 = new THREE.Mesh(new THREE.BoxGeometry(0.01, 60, 30), new THREE.MeshLambertMaterial());
+  t1.position.set(-43, 50, -169.9);
+  t1.rotation.y = Math.PI / 2;
+  scene.add(t1);
+  var t2 = new THREE.Mesh(new THREE.BoxGeometry(0.01, 60, 30), new THREE.MeshLambertMaterial());
+  t2.position.set(21, 50, -169.9);
+  t2.rotation.y = Math.PI / 2;
+  scene.add(t2);
+  var Spotlight12 = new Lamp(-43, 135, -130, t1, 2, 1); //張大千荷塘野趣一二
+  var Spotlight13 = new Lamp(21, 135, -130, t2, 2, 1); //張大千荷塘野趣三四
+  var Spotlight20 = new Lamp(130, 135, 100, jadeAssembly, 2, 5); //玉石
+  var Spotlight21 = new Lamp(100, 135, -145, p22, 2, 1); //清明上河圖1
+  var Spotlight22 = new Lamp(165, 135, -145, p23, 2, 1); //清明上河圖2
+  var Spotlight23 = new Lamp(170, 135, -135, p24, 2, 4); //清明上河圖3
+  var Spotlight24 = new Lamp(170, 135, -80, p25, 2, 4); //清明上河圖4
+  var Spotlight25 = new Lamp(170, 135, -10, p26, 2, 4); //清明上河圖5
+
+  $('#turn').change(function() {
+    Spotlight2.turnLight($(this).val());
+    Spotlight3.turnLight($(this).val());
+    Spotlight4.turnLight($(this).val());
+    Spotlight11.turnLight($(this).val());
+    Spotlight12.turnLight($(this).val());
+    Spotlight13.turnLight($(this).val());
+    Spotlight20.turnLight($(this).val());
+    Spotlight21.turnLight($(this).val());
+    Spotlight22.turnLight($(this).val());
+    Spotlight23.turnLight($(this).val());
+    Spotlight24.turnLight($(this).val());
+    Spotlight25.turnLight($(this).val());
+  });
+  var car = makeCar();
+  car1 = car.clone();
+  car1.position.set(0, 400, 500);
+
+  car2 = car.clone();
+  car2.position.set(-90, 65, 120);
+  car2.rotation.y = Math.PI / 2;
+  
+  car3 = car.clone();
+  car3.position.set(-90, 65, 30);
+  car3.rotation.y = Math.PI / 2;
+  
+  car4 = car.clone();
+  car4.position.set(-130, 65, 60);
+  car4.rotation.y = Math.PI 
+	
+  car5 = car.clone();
+  car5.position.set( -43, 50, -80);
+  
+  car6 = car.clone();
+  car6.position.set( 37, 50, -80);
+	
+  car7 = car.clone();
+  car7.position.set(-80, 50, -100);
+	car7.rotation.y = Math.PI / 2;
+  
+  car8 = car.clone();
+  car8.position.set(120, 65, 20);
+	car8.rotation.y = -Math.PI / 2;
+  
+  car9 = car.clone();
+  car9.position.set(70, 65, 120);
+	car9.rotation.y = -Math.PI / 2;
+  
+  car10 = car.clone();
+  car10.position.set(132.5, 65, -50);
+  
+  car11 = car.clone();
+  car11.position.set(80, 65, -80);
+	car11.rotation.y = -Math.PI / 2;
+  
+  car12 = car.clone();
+  car12.position.set(80, 65, -100);
+	car12.rotation.y = -Math.PI / 2;
+}
+
+function makeCar() {
+  var car = new THREE.Group();
+  var normalMat = new THREE.MeshNormalMaterial({
+    wireframe: true
+  });
+  var body = new THREE.Mesh(new THREE.CylinderGeometry(15, 15, 4, 20), normalMat);
+  car.add(body);
+  return car;
+}
+
+function buildFloor() {
+  var floor = new THREE.Group();
+  let woodTex1 = new THREE.TextureLoader().load("https://i.imgur.com/OGaAX5X.png");
+  let mat = new THREE.MeshLambertMaterial({
+    map: woodTex1
+  });
+  woodTex1.repeat.set(1, 1);
+  woodTex1.wrapS = THREE.RepeatWrapping;
+  var floorTop = new THREE.Mesh(new THREE.BoxGeometry(400, 1, 340), mat);
+  floor.add(floorTop);
+  return floor;
+}
+
+function buildDraws(w, h, d, x, y, z, link, type, way, dir) {
+  var tvGroup = new THREE.Group();
+
+  var tvGeom = new THREE.BoxGeometry(w, h, d);
+  var materials = [];
+
+  var loader = new THREE.TextureLoader();
+  var woodTex = loader.load("https://i.imgur.com/oAQD9wh.jpg");
+  var mPx, mPy, mPz, mNx, mNy, mNz;
+  var conTex = loader.load(link);
+  if (way === 1) {
+    mPx = new THREE.MeshLambertMaterial({
+      map: conTex
+    });
+    mNx = new THREE.MeshLambertMaterial({
+      map: woodTex
+    });
+    mPy = new THREE.MeshLambertMaterial({
+      map: woodTex
+    });
+    mNy = new THREE.MeshLambertMaterial({
+      map: woodTex
+    });
+    mPz = new THREE.MeshLambertMaterial({
+      map: woodTex
+    });
+    mNz = new THREE.MeshLambertMaterial({
+      map: woodTex
+    });
+  } else {
+    mPx = new THREE.MeshLambertMaterial({
+      map: woodTex
+    });
+    mNx = new THREE.MeshLambertMaterial({
+      map: conTex
+    });
+    mPy = new THREE.MeshLambertMaterial({
+      map: woodTex
+    });
+    mNy = new THREE.MeshLambertMaterial({
+      map: woodTex
+    });
+    mPz = new THREE.MeshLambertMaterial({
+      map: woodTex
+    });
+    mNz = new THREE.MeshLambertMaterial({
+      map: woodTex
+    });
+  }
+  mPx.visible = false;
+  materials.push(mPx, mNx, mPy, mNy, mPz, mNz);
+  var tv = new THREE.Mesh(tvGeom, materials);
+  let frameMap;
+  if (type === 1) {
+    frameMap = new THREE.TextureLoader().load('https://i.imgur.com/YWvEIPP.png');
+  } else if (type === 2) {
+    frameMap = new THREE.TextureLoader().load('https://i.imgur.com/nOV2bWh.png');
+  } else if (type === 0) {
+    frameMap = 0;
+  }
+  let frame = new THREE.Mesh(new THREE.BoxGeometry(w * 1.01, h * 1.01, d * 1.01), new THREE.MeshLambertMaterial({
+    map: frameMap,
+    transparent: true
+  }));
+
+  var screen = new THREE.Mesh(new THREE.PlaneGeometry(d, h),
+    new THREE.MeshLambertMaterial({
+      map: conTex
+    }));
+  screen.position.set(0, 0, 0);
+  screen.rotation.y = Math.PI / 2;
+  tvGroup.add(tv, screen);
+  if (dir === 1) {
+    tvGroup.rotation.y = Math.PI / 2;
+    frame.rotation.y = Math.PI / 2;
+  } else if (dir === 2) {
+    tvGroup.rotation.y = -Math.PI / 2;
+    frame.rotation.y = -Math.PI / 2;
+  }
+  tvGroup.position.set(x, y, z);
+  frame.position.set(x, y, z);
+  scene.add(tvGroup);
+  if (type == 1 || type == 2) {
+    scene.add(frame);
+  }
+  return tvGroup;
+}
+
+function buildBoard(w, h, d) {
+  let loader = new THREE.TextureLoader();
+  loader.crossOrigin = '';
+  let texture = loader.load('https://i.imgur.com/ThguBhL.png');
+
+  var texMat = new THREE.MeshBasicMaterial({
+    map: texture,
+    side: THREE.DoubleSide
+  });
+  var mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), texMat);
+
+  return mesh;
+
+}
+
+function buildPole(w, h, d) {
+  let pole;
+  pole = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({
+    color: 0x000000
+  }));
+  return pole;
+}
+
+//width,height,depth
+function buildOutWalls(w, h, d) {
+  let wall;
+  wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({
+    color: 0x808080
+  }));
+  return wall;
+}
+
+function buildInWalls(w, h, d) {
+  let wall;
+  wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({
+    color: 0x808080
+  }));
+  return wall;
+}
+
+
+function buildBooth() {
+  let booth;
+  booth = new THREE.Mesh(new THREE.BoxGeometry(30, 50, 30), new THREE.MeshLambertMaterial({
+    color: 0xffffff
+  }));
+  return booth;
+}
+
+function buildPillar() {
+  let pillar;
+  pillar = new THREE.Mesh(new THREE.BoxGeometry(40, 120, 20), new THREE.MeshLambertMaterial({
+    color: 0x808080
+  }));
+  return pillar;
+}
+
+function buildChair() {
+  var group = new THREE.Group();
+  var woodTex = new THREE.TextureLoader().load("https://i.imgur.com/YQsNXsx.jpg");
+  var mat = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  var boxTop = new THREE.Mesh(new THREE.BoxGeometry(60, 10, 20), mat);
+  var boxLeg1 = new THREE.Mesh(new THREE.BoxGeometry(10, 30, 20), mat);
+  var boxLeg2 = new THREE.Mesh(new THREE.BoxGeometry(10, 30, 20), mat);
+  boxTop.position.set(0, 25, 0);
+  boxLeg1.position.set(-25, 14, 0);
+  boxLeg2.position.set(25, 14, 0);
+  group.add(boxTop, boxLeg1, boxLeg2);
+  return group;
+}
+
+function clamp(v, lo, hi) {
+  if (v < lo) return lo;
+  if (v > hi) return hi;
+  return v;
+}
+var num;
+$('#zero').click ( function () {
+	num=0;
+})
+$('#one').click ( function () {
+	num=1;
+})
+$('#two').click ( function () {
+	num=2;
+})
+$('#three').click ( function () {
+	num=3;
+})
+$('#four').click ( function () {
+	num=4;
+})
+$('#five').click ( function () {
+	num=5;
+})
+$('#six').click ( function () {
+	num=6;
+})
+$('#seven').click ( function () {
+	num=7;
+})
+$('#eight').click ( function () {
+	num=8;
+})
+$('#nine').click ( function () {
+	num=9;
+})
+$('#ten').click ( function () {
+	num=10;
+})
+$('#ele').click ( function () {
+	num=11;
+})
+function Move() {
+	if (num===0) {
+    camera.position.set(0, 400, 500);
+    camera.lookAt(0, 0, 0);
+  }
+  if (num===1) {
+    camera.position.lerpVectors(camera.position, car2.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car2.quaternion, alpha);
+  }
+  if (num===2) {
+    camera.position.lerpVectors(camera.position, car3.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car3.quaternion, alpha);
+  }
+  if (num===3) {
+    camera.position.lerpVectors(camera.position, car4.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car4.quaternion, alpha);
+  }
+	if (num===4) {
+    camera.position.lerpVectors(camera.position, car5.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car5.quaternion, alpha);
+  }
+  if (num===5) {
+    camera.position.lerpVectors(camera.position, car6.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car6.quaternion, alpha);
+    camera.lookAt(30, 56, -160);
+  }
+  if (num===6) {
+    camera.position.lerpVectors(camera.position, car7.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car7.quaternion, alpha);
+  }
+  if (num===7) {
+    camera.position.lerpVectors(camera.position, car8.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car8.quaternion, alpha);
+    camera.lookAt(170, 65, 60);
+  }
+  if (num===8) {
+    camera.position.lerpVectors(camera.position, car9.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car9.quaternion, alpha);
+    camera.lookAt(130, 65, 100);
+  }
+  if (num===9) {
+    camera.position.lerpVectors(camera.position, car10.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car10.quaternion, alpha);
+
+  }
+  if (num===10) {
+    camera.position.lerpVectors(camera.position, car11.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car11.quaternion, alpha);
+		camera.lookAt(170, 65, -115);
+  }
+  if (num===11) {
+    camera.position.lerpVectors(camera.position, car12.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car12.quaternion, alpha);
+		camera.lookAt(170, 65, -65);
+  }
+}
+
+function animate() {
+  alpha += 0.001;
+  alpha = clamp(alpha, 0, 0.05);
+  var dt = clock.getDelta();
+  Move();
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+</script>
+</body>
+
+</html>
