@@ -39,39 +39,25 @@ body {
 <option value="90"></option>
 <option value="100"></option>
 </datalist>聚光燈開關
-<input type="range" id='turn' min=0 max=1  >
-
-<select id="draw" name="draw">
-  <option value = 0>鳥瞰</option>
-  <optgroup label="世界名畫">
-    <option value = 2 >梵谷-耳朵綁上繃帶的自畫像</option>
-    <option value = 3 >梵谷-自畫像</option>
-    <option value = 4 >達文西-蒙娜麗莎的微笑</option>
-  </optgroup>
-  <optgroup label="水墨畫">
-    <option value = 12 >張大千-荷塘野趣一二</option>
-    <option value = 15 >張大千-荷塘野趣三四</option>
-  </optgroup>
-  <optgroup label="台灣畫家">
-    <option value = 11 >黃土水-水牛群像</option>
-  </optgroup>
-   <optgroup label="漢文化">
-
-    <option value = 19 >楷書</option>
-    <option value = 22 >古玉</option> 
-  </optgroup>
-  <optgroup label="清明上河圖">
-    <option value = 23 >清明上河圖左</option>
-    <option value = 24 >清明上河圖右一</option>
-    <option value = 25 >清明上河圖右二</option>
-  </optgroup>
-</select>
+<input type="range" id='turn' min=0 max=1  ><br>
+<button id='zero'>鳥瞰</button><br>世界名畫
+<button id='one'>梵谷-耳朵綁上繃帶的自畫像</button>
+<button id='two'>梵谷-自畫像</button>
+<button id='three'>達文西-蒙娜麗莎的微笑</button><br>水墨畫
+<button id='four'>張大千-荷塘野趣一二</button>
+<button id='five'>張大千-荷塘野趣三四</button><br>台灣畫家
+<button id='six'>黃土水-水牛群像</button><br>漢文化
+<button id='seven'>楷書</button>
+<button id='eight'>古玉</button><br>清明上河圖
+<button id='nine'>清明上河圖左</button>
+<button id='ten'>清明上河圖右一</button>
+<button id='ele'>清明上河圖右二</button>
 
 <script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="https://jyunming-chen.github.io/tutsplus/js/KeyboardState.js"></script>
-
+	
 <script>
 class Lamp {
   constructor(x, y, z, paint, type, turn) {
@@ -140,17 +126,14 @@ var camera, scene, renderer, eyecamera;
 var loader = new THREE.TextureLoader();
 var woodTex = loader.load("https://i.imgur.com/oAQD9wh.jpg");
 var alpha = 0;
-var looking;
-var Position = new THREE.Vector3();
-var pStand = new THREE.Vector3(0, 400, 500);
-
+var keyboard = new KeyboardState();
 init();
 animate();
 
 function init() {
 
   scene = new THREE.Scene();
-
+	clock = new THREE.Clock();
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x888888);
@@ -578,78 +561,60 @@ function init() {
     Spotlight24.turnLight($(this).val());
     Spotlight25.turnLight($(this).val());
   });
-	
+  var car = makeCar();
+  car1 = car.clone();
+  car1.position.set(0, 400, 500);
+
+  car2 = car.clone();
+  car2.position.set(-90, 65, 120);
+  car2.rotation.y = Math.PI / 2;
   
-  $("#draw").change(function() {
-  alpha = 0;
-  tmpAlpha = 0;
-  switch ($(this).val()) {
-    case "0":
-      pStand = new THREE.Vector3(0, 400, 500);
-      Position = new THREE.Vector3(0, 0, 0);
-      break;
+  car3 = car.clone();
+  car3.position.set(-90, 65, 30);
+  car3.rotation.y = Math.PI / 2;
+  
+  car4 = car.clone();
+  car4.position.set(-130, 65, 60);
+  car4.rotation.y = Math.PI 
+	
+  car5 = car.clone();
+  car5.position.set( -43, 50, -80);
+  
+  car6 = car.clone();
+  car6.position.set( 37, 50, -80);
+	
+  car7 = car.clone();
+  car7.position.set(-80, 50, -100);
+	car7.rotation.y = Math.PI / 2;
+  
+  car8 = car.clone();
+  car8.position.set(120, 65, 20);
+	car8.rotation.y = -Math.PI / 2;
+  
+  car9 = car.clone();
+  car9.position.set(70, 65, 120);
+	car9.rotation.y = -Math.PI / 2;
+  
+  car10 = car.clone();
+  car10.position.set(132.5, 65, -50);
+  
+  car11 = car.clone();
+  car11.position.set(80, 65, -80);
+	car11.rotation.y = -Math.PI / 2;
+  
+  car12 = car.clone();
+  car12.position.set(80, 65, -100);
+	car12.rotation.y = -Math.PI / 2;
+}
 
-    case "2":
-      pStand = new THREE.Vector3(-90, 65, 120);
-      Position = new THREE.Vector3(-140, 65, 120);
-      //camera.rotation.y = Math.PI / 2;
-      break;
-
-    case "3":
-      pStand = new THREE.Vector3(-90, 65, 30);
-      Position = new THREE.Vector3(-140, 65, 30);
-      //camera.rotation.y = Math.PI / 2;
-      break;
-
-    case "4":
-      pStand = new THREE.Vector3(-130, 65, 60);
-      Position = new THREE.Vector3(-130, 65, 125);
-      break;
-
-    case "12":
-      pStand = new THREE.Vector3(-43, 56, -80);
-      Position = new THREE.Vector3(-43, 56, -130);
-      break;
-
-    case "15":
-      pStand = new THREE.Vector3(38, 56, -80);
-      Position = new THREE.Vector3(30, 56, -168);
-      break;
-
-
-    case "11":
-      pStand = new THREE.Vector3(-80, 60, -100);
-      Position = new THREE.Vector3(-160, 60, -100);
-      break;
-
-    case "19":
-      pStand = new THREE.Vector3(120, 65, 20);
-      Position = new THREE.Vector3(170, 65, 60);
-      break;
-
-    case "22":
-      pStand = new THREE.Vector3(70, 65, 120);
-      Position = new THREE.Vector3(130, 65, 100);
-      break;
-
-    case "23":
-      pStand = new THREE.Vector3(132.5, 65, -50);
-      Position = new THREE.Vector3(132.5, 65, -145);
-      break;
-
-    case "24":
-      pStand = new THREE.Vector3(80, 65, -80);
-      Position = new THREE.Vector3(170, 65, -115);
-      break;
-
-    case "25":
-      pStand = new THREE.Vector3(80, 65, -100);
-      Position = new THREE.Vector3(170, 65, -65);
-      break;
-  }
-});
-
-
+function makeCar() {
+  var car = new THREE.Group();
+  var normalMat = new THREE.MeshNormalMaterial({
+    wireframe: true
+  });
+  var body = new THREE.Mesh(new THREE.CylinderGeometry(15, 15, 4, 20), normalMat);
+  car.add(body);
+  return car;
 }
 
 function buildFloor() {
@@ -831,17 +796,109 @@ function clamp(v, lo, hi) {
   if (v > hi) return hi;
   return v;
 }
+var num;
+$('#zero').click ( function () {
+	num=0;
+})
+$('#one').click ( function () {
+	num=1;
+})
+$('#two').click ( function () {
+	num=2;
+})
+$('#three').click ( function () {
+	num=3;
+})
+$('#four').click ( function () {
+	num=4;
+})
+$('#five').click ( function () {
+	num=5;
+})
+$('#six').click ( function () {
+	num=6;
+})
+$('#seven').click ( function () {
+	num=7;
+})
+$('#eight').click ( function () {
+	num=8;
+})
+$('#nine').click ( function () {
+	num=9;
+})
+$('#ten').click ( function () {
+	num=10;
+})
+$('#ele').click ( function () {
+	num=11;
+})
+function Move() {
+	if (num===0) {
+    camera.position.set(0, 400, 500);
+    camera.lookAt(0, 0, 0);
+  }
+  if (num===1) {
+    camera.position.lerpVectors(camera.position, car2.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car2.quaternion, alpha);
+  }
+  if (num===2) {
+    camera.position.lerpVectors(camera.position, car3.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car3.quaternion, alpha);
+  }
+  if (num===3) {
+    camera.position.lerpVectors(camera.position, car4.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car4.quaternion, alpha);
+  }
+	if (num===4) {
+    camera.position.lerpVectors(camera.position, car5.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car5.quaternion, alpha);
+  }
+  if (num===5) {
+    camera.position.lerpVectors(camera.position, car6.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car6.quaternion, alpha);
+    camera.lookAt(30, 56, -160);
+  }
+  if (num===6) {
+    camera.position.lerpVectors(camera.position, car7.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car7.quaternion, alpha);
+  }
+  if (num===7) {
+    camera.position.lerpVectors(camera.position, car8.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car8.quaternion, alpha);
+    camera.lookAt(170, 65, 60);
+  }
+  if (num===8) {
+    camera.position.lerpVectors(camera.position, car9.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car9.quaternion, alpha);
+    camera.lookAt(130, 65, 100);
+  }
+  if (num===9) {
+    camera.position.lerpVectors(camera.position, car10.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car10.quaternion, alpha);
+
+  }
+  if (num===10) {
+    camera.position.lerpVectors(camera.position, car11.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car11.quaternion, alpha);
+		camera.lookAt(170, 65, -115);
+  }
+  if (num===11) {
+    camera.position.lerpVectors(camera.position, car12.position, alpha);
+    camera.quaternion.slerpQuaternions(camera.quaternion, car12.quaternion, alpha);
+		camera.lookAt(170, 65, -65);
+  }
+}
 
 function animate() {
-  
+  alpha += 0.001;
+  alpha = clamp(alpha, 0, 0.05);
+  Move();
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
-  
-	alpha += 0.001;
-  alpha = clamp(alpha, 0, 0.05);
-  camera.position.lerpVectors(camera.position, pStand, alpha);
-  camera.quaternion.slerpQuaternions(camera.quaternion, camera.lookAt(Position), alpha);
+
 }
+
 
 </script>
 </body>
