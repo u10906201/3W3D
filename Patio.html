@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<style>
+#container {
+  width: 60vw;
+  height: 60vw;
+  float: left;
+  background-color: pink;
+  margin: 10px;
+}
+
+p {
+  margin: 10px;
+  text-align: justify;
+}
+
+</style>
+</head>
+
+<body> 
+<h1 style="font-size:2em; text-align:center; margin:15px">
+  Hw4 Patio
+</h1>
+<hr>
+<div id="container">
+</div>
+
+<div style="width:30.5vw; float:left; margin-left:5px; margin-bottom:5px; background-color:#C4E1FF; border-width:3px; border-style:outset; border-color:#003060; padding:5px;">
+  <div>Size:<br>
+    <input id="size" name='size' type="range" min=1 max=2 value=1 step=0.1>
+  </div>
+  <div>Rotation:<br>
+    <input id="rotation" type="range" min=0 max=6.28 value=0 step=0.1>
+  </div><br>
+  <div style="border-style:dashed; border-color:#006000; padding:5px; width:28vw;float:left;background-color:#BBFFBB">
+    Mode:<br>&ensp;
+    <input type=radio class='gclass' id='placing' name='g' value='place' checked>Place <br>&ensp;
+    <input type=radio class='gclass' id='deleting' name='g' value='delete'> Delete<br>&ensp;
+    <input type=radio class='gclass' id='moving'name='g' value='move'> Move
+  </div>
+  <div style="width:30vw;float:left;"><br>
+  </div>
+  <div style="border-style:dashed; border-color:#844200; padding:5px; width:28vw; float:left; background-color:#FFC78E;margin-bottom:15px">Select:<br>&ensp;
+    <input type=radio class='fclass' name='Geo' id='cc' value='1' checked> Chair 
+    <img src="https://i.imgur.com/dLn2Q3S.png" width="100%" height="100%" id='picture'>&ensp;
+    
+    <input type=radio class='fclass' name='Geo' id='t' value='2'> Table<br>
+     <img src="https://i.imgur.com/gPoNEcp.png" width="100%" height="100%" id='picture2'>
+  </div>
+  <div><br>
+    <button id='save'>Save</button>
+    <button id='clear'>Clear</button>
+    <button id='restore'>Restore</button>
+  </div>
+  <p id='debugMsg'>
+  </p>
+</div>
+
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<script>
+var scene, renderer, camera;
+var plane, puck;
+var thePuck;
+var mouse = new THREE.Vector2();
+var raycaster = new THREE.Raycaster();
+var cyl = new THREE.Object3D();
+var pucks = [];
+var tables =[];
+var puckId = 0;
+var loader = new THREE.TextureLoader();
+var cc = true,tt;
+var ch = buildChair();
+var ta = buildTable();
+$('.gclass').click(function() {
+  if ($(this).val() === 'place') {
+  	scene.add(puck);
+    placing = true;
+    deleting = false;
+    moving = false;
+  } else if ($(this).val() === 'delete') { // delete
+    deleting = true;
+    placing = false;
+    moving = false;
+    scene.remove(puck);
+    //cyl.visible = false;
+  } else if ($(this).val() === 'move') {
+    deleting = false;
+    placing = false;
+    moving = true;
+    scene.remove(puck);
+    //cyl.visible = false;
+  }
+});
+
+$('.fclass').click(function() {
+  if ($(this).val() === '1') {
+  	scene.remove(puck);
+    cc = true;
+    tt = false;
+    puck = buildChair();
+    scene.add(puck);
+  } else if ($(this).val() === '2') {
+  	scene.remove(puck);
+    tt = true;
+    cc = false;
+    puck = buildTable();
+    scene.add(puck);
+  }
+});
+
+var placing = true;
+var controls;
+init();
+animate();
+
+$('#save').click(function() {
+
+  // pucks --> puckRecs
+  var recs = [];
+  for (let i = 0; i < pucks.length; i++) {
+    var rec = {};
+    rec.name = pucks[i].name;
+    rec.x = pucks[i].position.x.toFixed(2);
+    rec.z = pucks[i].position.z.toFixed(2);
+    rec.rotation = pucks[i].rotation;
+    rec.scale = pucks[i].size;
+    recs.push(rec);
+  }
+
+  // puckRecs --> JSON.stringify --> localStorage
+  var recLog = JSON.stringify(recs);
+  localStorage.setItem('puckLog', recLog);
+
+});
+
+$('#clear').click(function() {
+
+  pucks.forEach(function(puck) {
+    puck.removeFromParent();
+  })
+  pucks = [];
+});
+
+$('#restore').click(function() {
+var parseLog = JSON.parse(localStorage.getItem('puckLog'));
+  for (let i = 0; i < parseLog.length; i++) {
+    var newPuck = puck.clone();
+    newPuck.position.set(parseLog[i].x, 0, parseLog[i].z);
+    scene.add(newPuck);
+    pucks.push (newPuck);
+  }
+});
+function init() {
+  var loader = new THREE.TextureLoader();
+  renderer = new THREE.WebGLRenderer({
+    antialias: true
+  });
+  var ww = $('#container').innerWidth();
+  var hh = $('#container').innerHeight();
+  renderer.setSize(ww, hh);
+  renderer.setClearColor(0x888888);
+  $('#container').append(renderer.domElement);
+
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(45, ww / hh, 1, 10000);
+  camera.position.set(150, 200, 250)
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+  var cyl_geom;
+	
+ $('#size').change(function() {
+  cyl_geom.scale.set($(this).val(), $(this).val(), $(this).val());
+});
+
+$('#rotation').change(function() {
+  cyl_geom.rotation.y = $(this).val();
+});
+
+  cyl_geom = buildChair();
+  puck = cyl_geom;
+  //puck.scale.set(1,1,1); 
+  scene.add(puck);
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
+  //scene.add(gridXZ);
+
+  // build an invisible plane, overlapping the grid
+  plane = new THREE.Mesh(
+    new THREE.PlaneGeometry(200, 200),
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff
+    }));
+  plane.rotation.x = -Math.PI / 2;
+  plane.material.visible = false; // invisible, for picking only
+  scene.add(plane);
+
+  //地板
+
+  var floorGroup = new THREE.Group();
+  var grassMap = loader.load('https://i.imgur.com/xc9Jykr.jpg');
+  var grassAlpha = loader.load('https://i.imgur.com/fDpPDL7.png');
+  var grassFloor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshBasicMaterial({
+    map: grassMap,
+    transparent: true,
+    alphaMap: grassAlpha
+  }));
+
+  var stoneMap = loader.load('https://i.imgur.com/jaB8ODA.jpg');
+  var stoneAlpha = loader.load('https://i.imgur.com/bYJVTJC.png');
+  var stoneFloor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshBasicMaterial({
+    map: stoneMap,
+    transparent: true,
+    alphaMap: stoneAlpha
+  }));
+
+  var stoneMap2 = loader.load('https://i.imgur.com/ZQ8t1S8.jpg');
+  var stoneAlpha2 = loader.load('https://i.imgur.com/YuIGZwF.png');
+  var stoneFloor2 = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshBasicMaterial({
+    map: stoneMap2,
+    transparent: true,
+    alphaMap: stoneAlpha2
+  }));
+  floorGroup.add(grassFloor, stoneFloor, stoneFloor2);
+  scene.add(floorGroup);
+
+  floorGroup.rotation.x = -Math.PI / 2;
+
+
+  window.addEventListener('resize', onWindowResize, false);
+
+  $('#container').on("pointerdown", onDocumentMouseDown);
+  $('#container').on("pointermove", onDocumentMouseMove);
+  $('#container').on("pointerup", onMouseUp);
+  //window.addEventListener('mousemove', onDocumentMouseMove, false);
+  thePuck = null;
+  
+  buildTable();
+}
+
+function onWindowResize() {
+  var ww = $('#container').innerWidth();
+  var hh = $('#container').innerHeight();
+  camera.aspect = ww / hh;
+  camera.updateProjectionMatrix();
+  renderer.setSize(ww, hh);
+}
+
+function onDocumentMouseDown(event) {
+  event.preventDefault();
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  if (placing === true) {
+    var intersects = raycaster.intersectObject(plane);
+    if (intersects.length > 0) {
+      var newPuck = puck.clone();
+      newPuck.position.copy(intersects[0].point);
+      if(cc===true){
+      setChair($('#size').val(), $('#rotation').val(), intersects[0].point);
+      }else if(tt ===true){
+      setTable($('#size').val(), $('#rotation').val(), intersects[0].point);
+      
+      }
+      //scene.add(newPuck);
+      //pucks.push(newPuck);
+      } 
+  } else if (deleting === true) { // delete
+    var intersects = raycaster.intersectObjects(pucks);
+    if (intersects.length > 0) {
+      thePuck = intersects[0].object.parent;
+      //scene.remove(thePuck);
+      thePuck.removeFromParent();
+      // remove thePuck from pucks
+      for (let i = 0; i < pucks.length; i++) {
+        if (pucks[i] === thePuck) {
+          pucks.splice(i, 1);
+          break;
+        }
+      }
+    }
+  } else if (moving === true) { // move
+    var intersects = raycaster.intersectObjects(pucks);
+    if (intersects.length > 0) {
+      thePuck = intersects[0].object.parent;
+    }
+  }
+}
+
+function onMouseUp(event) {
+  if (pucks.length === 0) {
+    placing = true;
+    $('#placing').prop('checked', true);
+    // https://stackoverflow.com/questions/15044340/jquery-set-checkbox-checked
+  }
+  //$('#debugMsg').text(pucks.length + ' pucks on plane');
+  thePuck = null;
+  controls.enabled = true;
+}
+
+function onDocumentMouseMove(event) {
+  event.preventDefault();
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObject(plane);
+  if (intersects.length > 0) {
+    if (placing === true) {
+      puck.visible = true;
+      puck.position.copy(intersects[0].point);
+    } else {
+      puck.visible = false;
+    }
+    if (thePuck != null) {
+      controls.enabled = false;
+      thePuck.visible = true;
+      thePuck.position.copy(intersects[0].point);
+    } else {
+      cyl.position.copy(intersects[0].point);
+      cyl.position.y = 0.5;
+    }
+  }
+}
+
+function buildChair() {
+  let normalMat = new THREE.MeshBasicMaterial({
+    wireframe: true,
+    color: 0x009393
+  });
+
+  let normalLegMat = new THREE.MeshBasicMaterial({
+    color: 0x009393
+  });
+
+  let back = new THREE.Mesh(new THREE.BoxGeometry(10, 15, 1, 8, 10, 2), normalMat);
+  back.position.set(0, 18.5, 0);
+  back.rotation.x = -Math.PI / 12;
+
+  let seat = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 1, 10, 10, 4), normalMat);
+  seat.position.set(0, 11, 6.5);
+  seat.rotation.x = Math.PI / 2;
+
+  let arm1 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.5, 10, 8, 8, 2), normalMat);
+  arm1.position.set(5, 12, 6.5);
+  arm1.rotation.z = -Math.PI / 18;
+
+  let arm2 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.5, 10, 8, 8, 2), normalMat);
+  arm2.position.set(-5, 12, 6.5);
+  arm2.rotation.z = Math.PI / 18;
+
+  let leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 10, 32), normalLegMat);
+  leg1.position.set(-5, 6, 0.5);
+  leg1.rotation.x = Math.PI / 10;
+
+  let leg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 10, 32), normalLegMat);
+  leg2.position.set(-5, 6, 12.5);
+  leg2.rotation.x = -Math.PI / 10;
+
+  let line1 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 15.5, 32), normalLegMat);
+  line1.position.set(-5, 1, 6.5);
+  line1.rotation.x = Math.PI / 2;
+
+  let leg3 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 10, 32), normalLegMat);
+  leg3.position.set(5, 6, 0.5);
+  leg3.rotation.x = Math.PI / 10;
+
+  let leg4 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 10, 32), normalLegMat);
+  leg4.position.set(5, 6, 12.5);
+  leg4.rotation.x = -Math.PI / 10;
+
+  let line2 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 15.5, 32), normalLegMat);
+  line2.position.set(5, 1, 6.5);
+  line2.rotation.x = Math.PI / 2;
+
+  let pillar1 = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 15.25, 32), normalLegMat);
+  pillar1.position.set(4.75, 18.625, 0);
+  pillar1.rotation.x = -Math.PI / 12;
+
+  let pillar2 = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 15.25, 32), normalLegMat);
+  pillar2.position.set(-4.75, 18.625, 0);
+  pillar2.rotation.x = -Math.PI / 12;
+  //scene.add(back, seat, arm1, arm2,leg1,leg2,line1,leg3,leg4,line2);
+  var mesh1 = new THREE.Object3D();
+  mesh1.add(back, seat, arm1, arm2, leg1, leg2, line1, leg3, leg4, line2, pillar1, pillar2);
+
+  return mesh1;
+}
+
+function setChair(size, rotation, pos) {
+  var chair = buildChair();
+  var prop = {
+  	Geo:1,
+    size:size,
+    rotation:rotation,
+    pos: [pos.x, pos.z]
+  };
+  chair.name = JSON.stringify(prop);
+  chair.scale.set(size, size, size);
+  chair.position.copy(pos);
+  chair.rotation.y = rotation;
+  pucks.push(chair);
+  scene.add(chair);
+}
+
+function buildTable()
+{
+	let topMap = loader.load('https://i.imgur.com/tT2jqDl.jpg');
+  
+  let roundMap =loader.load('https://i.imgur.com/dmPedZf.jpg');
+  
+  let topMat = new THREE.MeshBasicMaterial({
+    map:topMap
+  });
+  
+  let roundMat = new THREE.MeshBasicMaterial({
+    map:roundMap
+  });
+  
+  let top = new THREE.Mesh(new THREE.BoxGeometry(44,2.5,22), topMat);
+  top.position.set(0,18,0);
+  let board1 = new THREE.Mesh(new THREE.BoxGeometry(18,12,1.5), roundMat);
+  board1.position.set(20,11,0);
+  board1.rotation.y=Math.PI/2;
+  
+  let board2 = new THREE.Mesh(new THREE.BoxGeometry(18,12,1.5), roundMat);
+  board2.position.set(-20,11,0);
+  board2.rotation.y=Math.PI/2;
+  
+  let board3 = new THREE.Mesh(new THREE.BoxGeometry(40,18,1.5), roundMat);
+  board3.position.set(0,6,0);
+  board3.rotation.x=Math.PI/2;
+  
+  let leg1 = new THREE.Mesh(new THREE.BoxGeometry(1.5,5,1.5), roundMat);
+  leg1.position.set(20,2.5,8);
+  
+  let leg2 = new THREE.Mesh(new THREE.BoxGeometry(1.5,5,1.5), roundMat);
+  leg2.position.set(-20,2.5,8);
+  
+  let leg3 = new THREE.Mesh(new THREE.BoxGeometry(1.5,5,1.5), roundMat);
+  leg3.position.set(-20,2.5,-8);
+  
+  let leg4 = new THREE.Mesh(new THREE.BoxGeometry(1.5,5,1.5), roundMat);
+  leg4.position.set(20,2.5,-8);
+  
+  //scene.add(top,board1,board2,board3,leg1,leg2,leg3,leg4);
+  var mesh2 = new THREE.Object3D();
+  mesh2.add(top,board1,board2,board3,leg1,leg2,leg3,leg4);
+  
+  return mesh2;
+}
+
+function setTable(size, rotation, pos) {
+  var table = buildTable();
+  var prop = {
+  	Geo:2,
+    size:size,
+    rotation:rotation,
+    pos: [pos.x, pos.z]
+  };
+  table.name = JSON.stringify(prop);
+  table.scale.set(size, size, size);
+  table.position.copy(pos);
+  table.rotation.y = rotation;
+  pucks.push(table);
+  scene.add(table);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  render();
+  //$('#debugMsg').text(pucks.length + ' pucks on plane');
+}
+
+function render() {
+  renderer.render(scene, camera);
+}
+
+</script>
+</body>
+
+</html>
