@@ -71,47 +71,51 @@ var mouse = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 var cyl = new THREE.Object3D();
 var pucks = [];
-var tables =[];
 var puckId = 0;
 var loader = new THREE.TextureLoader();
-var cc = true,tt;
-var ch = buildChair();
-var ta = buildTable();
+var cc = true,tt=false;
+
 $('.gclass').click(function() {
   if ($(this).val() === 'place') {
-  	scene.add(puck);
     placing = true;
     deleting = false;
     moving = false;
+    cyl.visible = true;
   } else if ($(this).val() === 'delete') { // delete
     deleting = true;
     placing = false;
     moving = false;
-    scene.remove(puck);
-    //cyl.visible = false;
+    cyl.visible = false;
   } else if ($(this).val() === 'move') {
     deleting = false;
     placing = false;
     moving = true;
-    scene.remove(puck);
-    //cyl.visible = false;
+    cyl.visible = false;
   }
 });
 
 $('.fclass').click(function() {
+  scene.remove(cyl);
   if ($(this).val() === '1') {
-  	scene.remove(puck);
-    cc = true;
-    tt = false;
-    puck = buildChair();
-    scene.add(puck);
+  	cc=true;
+    tt=false;
+    cyl = buildChair();
   } else if ($(this).val() === '2') {
-  	scene.remove(puck);
-    tt = true;
-    cc = false;
-    puck = buildTable();
-    scene.add(puck);
+  	cc=false;
+    tt=true;
+    cyl = buildTable();
   }
+  cyl.scale.set($('#size').val(), $('#size').val(), $('#size').val());
+  cyl.rotation.y = $('#rotation').val();
+  scene.add(cyl);
+});
+
+$('#size').change(function() {
+  cyl.scale.set($(this).val(), $(this).val(), $(this).val());
+});
+
+$('#rotation').change(function() {
+  cyl.rotation.y = $(this).val();
 });
 
 var placing = true;
@@ -123,24 +127,15 @@ $('#save').click(function() {
 
   // pucks --> puckRecs
   var recs = [];
-  for (let i = 0; i < pucks.length; i++) {
-    var rec = {};
-    rec.name = pucks[i].name;
-    rec.x = pucks[i].position.x.toFixed(2);
-    rec.z = pucks[i].position.z.toFixed(2);
-    rec.rotation = pucks[i].rotation;
-    rec.scale = pucks[i].size;
-    recs.push(rec);
-  }
-
+  pucks.forEach(function(puck) {
+    recs.push(puck.name);
+  });
   // puckRecs --> JSON.stringify --> localStorage
-  var recLog = JSON.stringify(recs);
-  localStorage.setItem('puckLog', recLog);
+  localStorage.setItem('puckLog', JSON.stringify(recs));
 
 });
 
 $('#clear').click(function() {
-
   pucks.forEach(function(puck) {
     puck.removeFromParent();
   })
@@ -148,14 +143,20 @@ $('#clear').click(function() {
 });
 
 $('#restore').click(function() {
-var parseLog = JSON.parse(localStorage.getItem('puckLog'));
-  for (let i = 0; i < parseLog.length; i++) {
-    var newPuck = puck.clone();
-    newPuck.position.set(parseLog[i].x, 0, parseLog[i].z);
-    scene.add(newPuck);
-    pucks.push (newPuck);
-  }
+  var recs = JSON.parse(localStorage.getItem('puckLog'));
+  
+  recs.forEach(function(puckLog) {
+  	var Log = JSON.parse(puckLog);
+
+    if(Log.Geo === 1){
+    	setChair(Log.size,Log.rotation,new THREE.Vector3(Log.pos[0], 0, Log.pos[1]));
+    }
+    if(Log.Geo === 2){
+    	setTable(Log.size,Log.rotation,new THREE.Vector3(Log.pos[0], 0, Log.pos[1]));
+    }
+  });
 });
+
 function init() {
   var loader = new THREE.TextureLoader();
   renderer = new THREE.WebGLRenderer({
@@ -173,20 +174,8 @@ function init() {
   camera.position.set(150, 200, 250)
   camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-  var cyl_geom;
-	
- $('#size').change(function() {
-  cyl_geom.scale.set($(this).val(), $(this).val(), $(this).val());
-});
-
-$('#rotation').change(function() {
-  cyl_geom.rotation.y = $(this).val();
-});
-
-  cyl_geom = buildChair();
-  puck = cyl_geom;
-  //puck.scale.set(1,1,1); 
-  scene.add(puck);
+  cyl = buildChair();
+  scene.add(cyl);
 
   controls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -241,9 +230,6 @@ $('#rotation').change(function() {
   $('#container').on("pointermove", onDocumentMouseMove);
   $('#container').on("pointerup", onMouseUp);
   //window.addEventListener('mousemove', onDocumentMouseMove, false);
-  thePuck = null;
-  
-  buildTable();
 }
 
 function onWindowResize() {
@@ -262,21 +248,19 @@ function onDocumentMouseDown(event) {
   mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
 
   raycaster.setFromCamera(mouse, camera);
-
+  
   if (placing === true) {
     var intersects = raycaster.intersectObject(plane);
     if (intersects.length > 0) {
-      var newPuck = puck.clone();
-      newPuck.position.copy(intersects[0].point);
-      if(cc===true){
-      setChair($('#size').val(), $('#rotation').val(), intersects[0].point);
-      }else if(tt ===true){
-      setTable($('#size').val(), $('#rotation').val(), intersects[0].point);
-      
+      cyl.position.copy(intersects[0].point);
+      if (cc === true) {
+        setChair($('#size').val(), $('#rotation').val(), intersects[0].point);
+      } else if (tt === true) {
+        setTable($('#size').val(), $('#rotation').val(), intersects[0].point);
       }
       //scene.add(newPuck);
       //pucks.push(newPuck);
-      } 
+    }
   } else if (deleting === true) { // delete
     var intersects = raycaster.intersectObjects(pucks);
     if (intersects.length > 0) {
@@ -320,19 +304,23 @@ function onDocumentMouseMove(event) {
   raycaster.setFromCamera(mouse, camera);
   var intersects = raycaster.intersectObject(plane);
   if (intersects.length > 0) {
-    if (placing === true) {
-      puck.visible = true;
-      puck.position.copy(intersects[0].point);
-    } else {
-      puck.visible = false;
-    }
-    if (thePuck != null) {
+    cyl.position.copy(intersects[0].point);
+    if (thePuck === null) return;
+
+    if (moving === true) {
       controls.enabled = false;
-      thePuck.visible = true;
+      cy = thePuck.position.y;
       thePuck.position.copy(intersects[0].point);
-    } else {
-      cyl.position.copy(intersects[0].point);
-      cyl.position.y = 0.5;
+      thePuck.position.y = cy;
+
+      for (let i = 0; i < pucks.length; i++) {
+        if (pucks[i] == thePuck) {
+          pucks[i].name = JSON.parse(pucks[i].name);
+          pucks[i].name.pos[0] = intersects[0].point.x;
+          pucks[i].name.pos[1] = intersects[0].point.z;
+          pucks[i].name = JSON.stringify(pucks[i].name);
+        }
+      }
     }
   }
 }
@@ -395,6 +383,7 @@ function buildChair() {
   pillar2.position.set(-4.75, 18.625, 0);
   pillar2.rotation.x = -Math.PI / 12;
   //scene.add(back, seat, arm1, arm2,leg1,leg2,line1,leg3,leg4,line2);
+
   var mesh1 = new THREE.Object3D();
   mesh1.add(back, seat, arm1, arm2, leg1, leg2, line1, leg3, leg4, line2, pillar1, pillar2);
 
@@ -404,9 +393,9 @@ function buildChair() {
 function setChair(size, rotation, pos) {
   var chair = buildChair();
   var prop = {
-  	Geo:1,
-    size:size,
-    rotation:rotation,
+    Geo: 1,
+    size: size,
+    rotation: rotation,
     pos: [pos.x, pos.z]
   };
   chair.name = JSON.stringify(prop);
@@ -417,59 +406,58 @@ function setChair(size, rotation, pos) {
   scene.add(chair);
 }
 
-function buildTable()
-{
-	let topMap = loader.load('https://i.imgur.com/tT2jqDl.jpg');
-  
-  let roundMap =loader.load('https://i.imgur.com/dmPedZf.jpg');
-  
+function buildTable() {
+  let topMap = loader.load('https://i.imgur.com/tT2jqDl.jpg');
+
+  let roundMap = loader.load('https://i.imgur.com/dmPedZf.jpg');
+
   let topMat = new THREE.MeshBasicMaterial({
-    map:topMap
+    map: topMap
   });
-  
+
   let roundMat = new THREE.MeshBasicMaterial({
-    map:roundMap
+    map: roundMap
   });
-  
-  let top = new THREE.Mesh(new THREE.BoxGeometry(44,2.5,22), topMat);
-  top.position.set(0,18,0);
-  let board1 = new THREE.Mesh(new THREE.BoxGeometry(18,12,1.5), roundMat);
-  board1.position.set(20,11,0);
-  board1.rotation.y=Math.PI/2;
-  
-  let board2 = new THREE.Mesh(new THREE.BoxGeometry(18,12,1.5), roundMat);
-  board2.position.set(-20,11,0);
-  board2.rotation.y=Math.PI/2;
-  
-  let board3 = new THREE.Mesh(new THREE.BoxGeometry(40,18,1.5), roundMat);
-  board3.position.set(0,6,0);
-  board3.rotation.x=Math.PI/2;
-  
-  let leg1 = new THREE.Mesh(new THREE.BoxGeometry(1.5,5,1.5), roundMat);
-  leg1.position.set(20,2.5,8);
-  
-  let leg2 = new THREE.Mesh(new THREE.BoxGeometry(1.5,5,1.5), roundMat);
-  leg2.position.set(-20,2.5,8);
-  
-  let leg3 = new THREE.Mesh(new THREE.BoxGeometry(1.5,5,1.5), roundMat);
-  leg3.position.set(-20,2.5,-8);
-  
-  let leg4 = new THREE.Mesh(new THREE.BoxGeometry(1.5,5,1.5), roundMat);
-  leg4.position.set(20,2.5,-8);
-  
+
+  let top = new THREE.Mesh(new THREE.BoxGeometry(44, 2.5, 22), topMat);
+  top.position.set(0, 18, 0);
+  let board1 = new THREE.Mesh(new THREE.BoxGeometry(18, 12, 1.5), roundMat);
+  board1.position.set(20, 11, 0);
+  board1.rotation.y = Math.PI / 2;
+
+  let board2 = new THREE.Mesh(new THREE.BoxGeometry(18, 12, 1.5), roundMat);
+  board2.position.set(-20, 11, 0);
+  board2.rotation.y = Math.PI / 2;
+
+  let board3 = new THREE.Mesh(new THREE.BoxGeometry(40, 18, 1.5), roundMat);
+  board3.position.set(0, 6, 0);
+  board3.rotation.x = Math.PI / 2;
+
+  let leg1 = new THREE.Mesh(new THREE.BoxGeometry(1.5, 5, 1.5), roundMat);
+  leg1.position.set(20, 2.5, 8);
+
+  let leg2 = new THREE.Mesh(new THREE.BoxGeometry(1.5, 5, 1.5), roundMat);
+  leg2.position.set(-20, 2.5, 8);
+
+  let leg3 = new THREE.Mesh(new THREE.BoxGeometry(1.5, 5, 1.5), roundMat);
+  leg3.position.set(-20, 2.5, -8);
+
+  let leg4 = new THREE.Mesh(new THREE.BoxGeometry(1.5, 5, 1.5), roundMat);
+  leg4.position.set(20, 2.5, -8);
+
   //scene.add(top,board1,board2,board3,leg1,leg2,leg3,leg4);
   var mesh2 = new THREE.Object3D();
-  mesh2.add(top,board1,board2,board3,leg1,leg2,leg3,leg4);
-  
+  mesh2.add(top, board1, board2, board3, leg1, leg2, leg3, leg4);
+
   return mesh2;
 }
 
 function setTable(size, rotation, pos) {
   var table = buildTable();
   var prop = {
-  	Geo:2,
-    size:size,
-    rotation:rotation,
+    Geo: 2,
+    size: size,
+    rotation: rotation,
     pos: [pos.x, pos.z]
   };
   table.name = JSON.stringify(prop);
@@ -489,7 +477,6 @@ function animate() {
 function render() {
   renderer.render(scene, camera);
 }
-
 </script>
 </body>
 
