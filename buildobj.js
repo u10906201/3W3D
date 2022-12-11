@@ -1,5 +1,5 @@
 import * as THREE from "https://threejs.org/build/three.module.js";
-import{scene,car,T,ts} from "./init.js";
+import{scene,car,T,ts} from "https://u10906201.github.io/3W3D/init.js";
 
 var keys;
 
@@ -76,4 +76,5 @@ export function keyframe(t) {
   car.quaternion.slerpQuaternions (keys[ii][2], keys[ii+1][2], a);
 }
 
-
+export{makeCar,keyframe};
+export{car};
