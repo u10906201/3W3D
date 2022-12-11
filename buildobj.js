@@ -76,4 +76,5 @@ export function keyframe(t) {
   car.quaternion.slerpQuaternions (keys[ii][2], keys[ii+1][2], a);
 }
 
-
+export{makeCar,keyframe};
+export{car};
