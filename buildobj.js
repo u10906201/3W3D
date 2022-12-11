@@ -1,5 +1,5 @@
 import * as THREE from "https://threejs.org/build/three.module.js";
-import{scene,car,T,ts} from "./init.js";
+import{scene,car,T,ts} from "https://u10906201.github.io/3W3D/init.js";
 
 var keys;
 
