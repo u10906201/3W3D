@@ -1,5 +1,5 @@
 import * as THREE from "https://threejs.org/build/three.module.js";
-import {makeCar,obj,keyframe} from "./buildobj.js"
+import {makeCar,obj,keyframe} from "https://u10906201.github.io/3W3D/buildobj.js"
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.136/examples/jsm/controls/OrbitControls.js';
 
 var camera, scene, renderer;
