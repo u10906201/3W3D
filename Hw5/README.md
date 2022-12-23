@@ -2,9 +2,9 @@
 
 main.js will run a http server in http://127.0.0.1:1337
 
-The API takes an angle (theta) and returns the coordinate on the Rose curve.
+The API takes an angle (theta) and returns the coordinate on the HW5.
 
-rose.html, in turn, moves a circle along the rose curve based on the coordinates returned.
+Hw5.html
 
 ### Setup
 ```
@@ -23,11 +23,11 @@ rose.html, in turn, moves a circle along the rose curve based on the coordinates
 
 ### Link: 
 
-http://localhost:8080/rose.html
+http://localhost:1337/Hw5.html
 
 ### Response
 
-http://localhost:8080/rose.html -> html response: three.js demo
+http://localhost:1337/Hw5.html -> html response: three.js demo
 
 http://127.0.0.1:1337/api?argv=0.12 -> json response: {"status":0,"output":"1.23 2.23"}
 
@@ -40,5 +40,4 @@ Solution: add below two response headers to allow all domains access
  - "Access-Control-Allow-Origin": "*",
  - "Access-Control-Allow-Headers": "Content-Type"
 
- Code:  https://github.com/jyunming-chen/node-study/blob/master/mytest/main.js#L61-L62
  
