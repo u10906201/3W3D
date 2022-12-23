@@ -1,0 +1,233 @@
+<html>
+<head>
+<style>
+info {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: #ffff00
+}
+
+body {
+  overflow: hidden;
+}
+</style>
+</head>
+<h1 style="font-size:2em; text-align:center; margin:15px">
+  Hw5
+</h1><hr>
+<div id="container" style="float:left; margin:3px; width:60vw; height:60vw">
+</div>
+<div>Radius:<br>
+    <input id="radius" name='radius' type="range" min=1 max=10 value=5 step=1>
+  </div>
+<div><br>
+<button id='start' style="height:40px;width:80px ;margin-left:20px; border-width:3px; border-style:outset; border-color:#003060; padding:5px;" >Pause</button>
+</div>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+$('#radius').change(function() {
+  scene.remove(circle);
+  circle = bulidCircle($('#radius').val(), 'yellow');
+  scene.add(circle);
+});
+
+$('#start').click(function() {
+  power = !power;
+  if (power === true) {
+    $('#start').text('Pause');
+  } else {
+    $('#start').text('Start');
+  }
+});
+
+var camera, scene, renderer;
+var circle, pos, vel;
+var rectangle;
+var pick;
+var hit = 0;
+var raycaster = new THREE.Raycaster();
+var x1, x2, y1, y2;
+var radius;
+var xCenter, yCenter;
+var mouse = new THREE.Vector2();
+var power = true;
+
+init();
+animate();
+
+function getHit() {
+  // Call api 
+  // Need to be replaced by a public ip address
+  $.get("http://127.0.0.1:1337/api?radius=" + radius + "&x_center=" + pos.x + "&y_center=" + pos.y + "&x1=" + x1 + "&y1=" + y1 + "&x2=" + x2 + "&y2=" + y2 + "&velX=" + vel.x + "&velY=" + vel.y, function(data) {
+    if (data && data.output) {
+      hit = data.output;
+    }
+  });
+}
+
+function init() {
+
+  scene = new THREE.Scene();
+  renderer = new THREE.WebGLRenderer({
+    antialias: true
+  });
+  var ww = $('#container').innerWidth();
+  var hh = $('#container').innerHeight();
+  renderer.setSize(ww, hh);
+  renderer.setClearColor(0x555555);
+  $('#container').append(renderer.domElement);
+
+  camera = new THREE.OrthographicCamera(-100, 100, 100, -100, -10, 100);
+  camera.position.z = 50;
+
+  let geometry = new THREE.BufferGeometry();
+  let points = [];
+  points.push(
+    new THREE.Vector3(-80, -80, 0),
+    new THREE.Vector3(80, -80, 0),
+    new THREE.Vector3(80, 80, 0),
+    new THREE.Vector3(-80, 80, 0),
+    new THREE.Vector3(-80, -80, 0));
+  geometry.setFromPoints(points);
+  var border = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+    color: 'blue'
+  }));
+  scene.add(border);
+
+  rectangle = new THREE.Mesh(new THREE.PlaneGeometry(60, 25), new THREE.MeshBasicMaterial({
+    color: '#000000'
+  }));
+  rectangle.position.set(0, -30, 0);
+  scene.add(rectangle);
+
+  circle = bulidCircle(); //
+  scene.add(circle);
+  pos = new THREE.Vector3();
+  vel = new THREE.Vector3(10, 20);
+  window.addEventListener('resize', onWindowResize, false);
+  $('#container').on("pointerdown", onMouseDown);
+  $('#container').on("pointermove", onMouseMove);
+  $('#container').on("pointerup", onMouseUp);
+
+}
+
+function onWindowResize() {
+  var ww = $("#container").innerWidth();
+  var hh = $("#container").innerHeight();
+  camera.aspect = ww / hh;
+  camera.updateProjectionMatrix();
+  renderer.setSize(ww, hh);
+}
+
+function onMouseUp(event) {
+  pick = null;
+
+}
+
+function onMouseMove(event) {
+
+  event.preventDefault();
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObject(rectangle);
+  if (intersects.length > 0) {
+    document.body.style.cursor = 'pointer';
+    if (pick === null) return;
+    pick.position.copy(intersects[0].point);
+
+
+  } else {
+    document.body.style.cursor = 'auto';
+  }
+}
+
+function onMouseDown(event) {
+
+  event.preventDefault();
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObject(rectangle);
+  if (intersects.length > 0) {
+    pick = intersects[0].object;
+  }
+}
+
+function bulidCircle() {
+  var circle = new THREE.Mesh(new THREE.CircleGeometry($('#radius').val(), 20, 20), new THREE.MeshBasicMaterial({
+    color: 'cyan'
+  }));
+  circle.position.set(1000, 1000);
+  return circle;
+}
+
+function changeColor() {
+  if (circle.material.color.b === 0) {
+    circle.material.color.set('cyan');
+  } else {
+    circle.material.color.set('yellow');
+  }
+}
+
+function animate() {
+  var dt = 0.05;
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+
+  if (power === true) {
+    x1 = rectangle.position.x - 30;
+    y1 = rectangle.position.y - 15;
+    x2 = rectangle.position.x + 30;
+    y2 = rectangle.position.y + 15;
+    getHit();
+    pos.add(vel.clone().multiplyScalar(dt));
+    if (pos.x > 70 || pos.x < -70) {
+      vel.x *= -1;
+      changeColor();
+    }
+    if (pos.y > 70 || pos.y < -70) {
+      vel.y *= -1;
+      changeColor();
+    }
+
+
+    if (pos.x > rectangle.position.x - 30 & pos.x < rectangle.position.x + 30) {
+      if (pos.y + $('#radius').val() > rectangle.position.y & pos.y - $('#radius').val() < rectangle.position.y + 15 & vel.y < 0) {
+        vel.y *= -1;
+        changeColor();
+      }
+      if (pos.y + $('#radius').val() > rectangle.position.y - 15 & pos.y - $('#radius').val() < rectangle.position.y & vel.y > 0) {
+        vel.y *= -1;
+        changeColor();
+      }
+    }
+
+    if (pos.y > rectangle.position.y - 15 & pos.y < rectangle.position.y + 15) {
+      if (pos.x + $('#radius').val() > rectangle.position.x & pos.x - $('#radius').val() < rectangle.position.x + 30 & vel.x < 0) {
+        vel.x *= -1;
+        changeColor();
+      }
+      if (pos.x + $('#radius').val() > rectangle.position.x - 30 & pos.x - $('#radius').val() < rectangle.position.x & vel.x > 0) {
+        vel.x *= -1;
+        changeColor();
+      }
+    }
+    circle.position.copy(pos);
+  }
+}
+
+</script>
+</body>
+</html>
