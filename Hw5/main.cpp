@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-bool checkOverlap(double radius, double x_center, double y_center, double x1, double y1, double x2, double y2, double velX, double velY) {
+bool check(double radius, double x_center, double y_center, double x1, double y1, double x2, double y2, double velX, double velY) {
     int temp1 = 0, temp2 = 0;
     if (x_center > x1 && x_center < x2) {
       if (y_center + radius > (y1+y2)/2 && y_center - radius < y2 && velY < 0) {
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 		double y2 = atof(argv[7]);
 		double velX = atof(argv[8]);
 		double velY = atof(argv[9]);
-		int hit = checkOverlap(radius, x_center, y_center, x1, y1, x2, y2,velX,velY);
+		int hit = check(radius, x_center, y_center, x1, y1, x2, y2,velX,velY);
         printf("%d", hit);
     }
     exit(0);
